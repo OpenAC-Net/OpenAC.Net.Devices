@@ -54,7 +54,10 @@ namespace OpenAC.Net.Devices
 
         #region Methods
 
-        public override void Limpar() => serialPort.DiscardInBuffer();
+        public override void Limpar()
+        {
+            if (serialPort.IsOpen) serialPort.DiscardInBuffer();
+        }
 
         protected override bool OpenInternal()
         {

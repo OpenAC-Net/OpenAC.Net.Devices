@@ -57,7 +57,7 @@ namespace OpenAC.Net.Devices
                 // Precisa ser ajustada para ser usado no linux.
                 {"RAW", typeof(OpenRawStream)},
                 // Ainda em desenvolvimento
-                //{"USB", typeof(OpenUSBStream)},
+                {"USB", typeof(OpenUSBStream)},
 #endif
             };
         }

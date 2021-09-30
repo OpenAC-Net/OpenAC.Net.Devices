@@ -62,6 +62,8 @@ namespace OpenAC.Net.Devices
 
         public override async void Limpar()
         {
+            if (client == null || !client.Connected) return;
+
             var stream = client.GetStream();
 
             while (client.Available > 0)

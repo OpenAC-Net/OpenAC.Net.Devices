@@ -73,7 +73,7 @@ namespace OpenAC.Net.Devices
 
             Conectado = OpenInternal();
 
-            if (Config.ControlePorta) CloseInternal();
+            if (Config.ControlePorta && Conectado) CloseInternal();
         }
 
         public void Close()
@@ -82,7 +82,10 @@ namespace OpenAC.Net.Devices
                             $"- Device: {GetType().Name}" + Environment.NewLine +
                             $"{new string('-', 80)}");
 
-            Conectado = CloseInternal();
+            if (Config.ControlePorta && Conectado)
+                Conectado = false;
+            else if (CloseInternal())
+                Conectado = false;
         }
 
         public virtual void Limpar()
@@ -97,15 +100,25 @@ namespace OpenAC.Net.Devices
         public void Write(byte[] dados)
         {
             if (dados.Length < 1) return;
-            if (Config.ControlePorta) OpenInternal();
 
-            WriteInternal(Encoding.Convert(Encoding.UTF8, Config.Encoding, dados));
+            try
+            {
+                if (Config.ControlePorta) OpenInternal();
+
+                WriteInternal(Encoding.Convert(Encoding.UTF8, Config.Encoding, dados));
+            }
+            finally
+            {
+                if (Config.ControlePorta) CloseInternal();
+            }
         }
 
         public byte[] Read()
         {
             try
             {
+                if (Config.ControlePorta) OpenInternal();
+
                 var dados = ReadInternal();
                 return !dados.Any() ? dados : Encoding.Convert(Config.Encoding, Encoding.UTF8, dados);
             }
