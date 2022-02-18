@@ -30,9 +30,11 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using OpenAC.Net.Core;
+using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
@@ -47,22 +49,28 @@ namespace OpenAC.Net.Devices
 
         #region Constructor
 
-        public OpenTcpStream(OpenDeviceConfig config) : base(config)
+        public OpenTcpStream(TCPConfig config) : base(config)
         {
-            var ports = Config.Porta.Split(':');
-            if (ports.Length < 3) throw new ArgumentException("Endereço e porta não informados");
+            Guard.Against<ArgumentException>(config.IP.IsEmpty(), "Endereço não informados");
+            Guard.Against<ArgumentException>(config.Porta < 1, "Porta não informados");
 
-            conEndPoint = new IPEndPoint(IPAddress.Parse(ports[1]), int.Parse(ports[2]));
+            conEndPoint = new IPEndPoint(IPAddress.Parse(config.IP), config.Porta);
             client = new TcpClient();
         }
 
         #endregion Constructor
 
+        #region Properties
+
+        protected override int Available => client?.Available ?? 0;
+
+        #endregion Properties
+
         #region Methods
 
         public override async void Limpar()
         {
-            if (client == null || !client.Connected) return;
+            if (client is not { Connected: true }) return;
 
             var stream = client.GetStream();
 
@@ -79,6 +87,10 @@ namespace OpenAC.Net.Devices
 
             client.Connect(conEndPoint);
 
+            var stream = client.GetStream();
+            Reader = new BinaryReader(stream);
+            Writer = new BinaryWriter(stream);
+
             return client.Connected;
         }
 
@@ -86,8 +98,12 @@ namespace OpenAC.Net.Devices
         {
             if (!client.Connected) return false;
 
-            client.GetStream().Close();
-            client.Close();
+            ((IDisposable)client)?.Dispose();
+            Reader?.Dispose();
+            Writer?.Dispose();
+
+            Reader = null;
+            Writer = null;
 
             client = null;
             client = new TcpClient();
@@ -95,40 +111,11 @@ namespace OpenAC.Net.Devices
             return !client.Connected;
         }
 
-        protected override async void WriteInternal(byte[] dados)
-        {
-            if (dados.Length < 1) return;
-
-            await client.GetStream().WriteAsync(dados, 0, dados.Length);
-        }
-
-        protected override byte[] ReadInternal()
-        {
-            var ret = new List<byte>();
-            var stream = client.GetStream();
-
-            while (client.Available > 0)
-            {
-                var inbyte = new byte[1];
-                stream.Read(inbyte, 0, 1);
-                if (inbyte.Length < 1) continue;
-
-                var value = (byte)inbyte.GetValue(0);
-                ret.Add(value);
-            }
-
-            return ret.ToArray();
-        }
-
         #endregion Methods
 
         #region Dispose Methods
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing) GC.SuppressFinalize(this);
-            ((IDisposable)client)?.Dispose();
-        }
+        protected override void OnDisposing() => ((IDisposable)client)?.Dispose();
 
         #endregion Dispose Methods
     }

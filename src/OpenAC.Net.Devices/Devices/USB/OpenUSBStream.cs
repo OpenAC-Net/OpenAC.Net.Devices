@@ -290,9 +290,8 @@ namespace OpenAC.Net.Devices
             #region Methods
 
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-            public static extern SafeHandle CreateFile(string lpFileName, EFileAccess dwDesiredAccess, EFileShare dwShareMode,
-                IntPtr lpSecurityAttributes, ECreationDisposition dwCreationDisposition, EFileAttributes dwFlagsAndAttributes,
-                IntPtr hTemplateFile);
+            public static extern IntPtr CreateFile(string lpFileName, EFileAccess dwDesiredAccess, EFileShare dwShareMode, IntPtr lpSecurityAttributes,
+                ECreationDisposition dwCreationDisposition, EFileAttributes dwFlagsAndAttributes, IntPtr hTemplateFile);
 
             [DllImport("kernel32.dll", SetLastError = true)]
             public static extern bool SetupComm(IntPtr hFile, uint dwInQueue, uint dwOutQueue);
@@ -335,15 +334,15 @@ namespace OpenAC.Net.Devices
         public const string CSecVendors = "Vendors";
         public const int CReceiveBufferSize = 1024;
 
-        public const string sErrACBrWinUSBInvalidID = "{0} inválido [{1}]";
-        public const string sErrACBrWinUSBDeviceOutOfRange = "Dispositivo USB num: {0} não existe";
-        public const string sErrACBrWinUSBOpening = "Erro {0} ao abrir o Porta USB {1}";
-        public const string sErrACBrWinUSBClosing = "Erro {0} ao fechar a Porta USB {1}";
-        public const string sErrACBrWinUSBDescriptionNotFound = "Erro, dispositivo [{0}] não encontrado";
-        public const string sErrACBrWinUSBNotDeviceFound = "Nenhum dispositivo USB encontrado";
-        public const string sErrACBrWinUSBDeviceIsClosed = "Dispositivo USB não está aberto";
-        public const string sErrACBrWinUSBSendData = "Erro {0}, ao enviar {1} bytes para USB";
-        public const string sErrACBrWinUSBReadData = "Erro {0}, ao ler da USB";
+        public const string sErrWinUSBInvalidID = "{0} inválido [{1}]";
+        public const string sErrWinUSBDeviceOutOfRange = "Dispositivo USB num: {0} não existe";
+        public const string sErrWinUSBOpening = "Erro {0} ao abrir o Porta USB {1}";
+        public const string sErrWinUSBClosing = "Erro {0} ao fechar a Porta USB {1}";
+        public const string sErrWinUSBDescriptionNotFound = "Erro, dispositivo [{0}] não encontrado";
+        public const string sErrWinUSBNotDeviceFound = "Nenhum dispositivo USB encontrado";
+        public const string sErrWinUSBDeviceIsClosed = "Dispositivo USB não está aberto";
+        public const string sErrWinUSBSendData = "Erro {0}, ao enviar {1} bytes para USB";
+        public const string sErrWinUSBReadData = "Erro {0}, ao ler da USB";
 
         public const string sDescDevPosPrinter = "Impressora";
         public const string sDescDevLabelPrinter = "Etiquetadora";
@@ -353,38 +352,23 @@ namespace OpenAC.Net.Devices
 
         #region Constructors
 
-        public OpenUSBStream(OpenDeviceConfig config) : base(config)
+        public OpenUSBStream(SerialConfig config) : base(config)
         {
         }
 
         #endregion Constructors
 
+        #region Properties
+
+        protected override int Available => 0;
+
+        #endregion Properties
+
         #region Methods
 
-        protected override bool OpenInternal()
-        {
-            throw new NotImplementedException();
-        }
+        protected override bool OpenInternal() => throw new NotImplementedException();
 
-        protected override bool CloseInternal()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void WriteInternal(byte[] dados)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override byte[] ReadInternal()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            throw new NotImplementedException();
-        }
+        protected override bool CloseInternal() => throw new NotImplementedException();
 
         #endregion Methods
     }

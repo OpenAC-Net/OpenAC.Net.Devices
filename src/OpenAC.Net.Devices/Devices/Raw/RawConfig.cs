@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenRawStream.cs" company="OpenAC .Net">
+// <copyright file="RawConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,54 +29,86 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-using System.IO;
+using System.Text;
 
 namespace OpenAC.Net.Devices
 {
-    internal sealed class OpenRawStream : OpenDeviceStream
+    public sealed class RawConfig : NotifyPropertyChanges, IDeviceConfig
     {
         #region Fields
 
-        private readonly RawPrinterStream printer;
+        private string impressora;
+        private bool controlePorta;
+        private Encoding encoding;
+        private int timeOut;
+        private int tentativas;
+        private int intervaloTentativas;
+        private int readBufferSize;
+        private int writeBufferSize;
 
         #endregion Fields
 
+        #region Constructors
+
+        public RawConfig(string impressora)
+        {
+            this.impressora = impressora;
+        }
+
+        #endregion Constructors
+
         #region Properties
 
-        protected override int Available => 0;
+        public string Name => "Raw";
+
+        public string Impressora
+        {
+            get => impressora;
+            set => SetProperty(ref impressora, value);
+        }
+
+        public bool ControlePorta
+        {
+            get => controlePorta;
+            set => SetProperty(ref controlePorta, value);
+        }
+
+        public Encoding Encoding
+        {
+            get => encoding;
+            set => SetProperty(ref encoding, value);
+        }
+
+        public int TimeOut
+        {
+            get => timeOut;
+            set => SetProperty(ref timeOut, value);
+        }
+
+        public int Tentativas
+        {
+            get => tentativas;
+            set => SetProperty(ref tentativas, value);
+        }
+
+        public int IntervaloTentativas
+        {
+            get => intervaloTentativas;
+            set => SetProperty(ref intervaloTentativas, value);
+        }
+
+        public int ReadBufferSize
+        {
+            get => readBufferSize;
+            set => SetProperty(ref readBufferSize, value);
+        }
+
+        public int WriteBufferSize
+        {
+            get => writeBufferSize;
+            set => SetProperty(ref writeBufferSize, value);
+        }
 
         #endregion Properties
-
-        #region Constructor
-
-        public OpenRawStream(RawConfig config) : base(config)
-        {
-            printer = new RawPrinterStream(config.Impressora);
-        }
-
-        #endregion Constructor
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            Writer = new BinaryWriter(printer);
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            Writer?.Dispose();
-            Writer = null;
-            return true;
-        }
-
-        protected override void OnDisposing()
-        {
-            printer?.Dispose();
-        }
-
-        #endregion Methods
     }
 }

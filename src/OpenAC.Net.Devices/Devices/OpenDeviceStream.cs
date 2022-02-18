@@ -30,45 +30,68 @@
 // ***********************************************************************
 
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using OpenAC.Net.Core.Logging;
 
 namespace OpenAC.Net.Devices
 {
+    /// <summary>
+    /// Classe para comunicaçõ com dispositivos.
+    /// </summary>
     public abstract class OpenDeviceStream : IDisposable, IOpenLog
     {
+        #region Fields
+
+        private bool disposed;
+
+        #endregion Fields
+
         #region Constructors
 
-        protected OpenDeviceStream(OpenDeviceConfig config)
+        /// <summary>
+        /// Inicializa uma nova instancia da classe <see cref="OpenDeviceStream"/>
+        /// </summary>
+        /// <param name="config">Configurações da classe</param>
+        protected OpenDeviceStream(IDeviceConfig config)
         {
             Config = config;
         }
 
-        ~OpenDeviceStream()
-        {
-            Dispose(false);
-        }
+        /// <summary>
+        /// Destructor da classe
+        /// </summary>
+        ~OpenDeviceStream() => Dispose(false);
 
         #endregion Constructors
 
         #region Properties
 
-        public OpenDeviceConfig Config { get; }
+        public IDeviceConfig Config { get; }
 
         public bool Conectado { get; protected set; }
+
+        protected BinaryWriter Writer { get; set; }
+
+        protected BinaryReader Reader { get; set; }
+
+        protected abstract int Available { get; }
 
         #endregion Properties
 
         #region Methods
 
+        /// <summary>
+        /// Abre a conexão
+        /// </summary>
         public void Open()
         {
             this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
                             $"Open - {DateTime.Now:G}" + Environment.NewLine +
-                            $"- Device: {GetType().Name}" + Environment.NewLine +
-                            $"- TimeOut: {Config.TimeOut}" + Environment.NewLine +
-                            $"- Serial.: {Config.Porta} - BAUD={Config.Baud} DATA={Config.DataBits} PARITY={Config.Parity} STOP={Config.StopBits} HANDSHAKE={Config.Handshake}" + Environment.NewLine +
+                            $"- Config: {Config.Name}" + Environment.NewLine +
                             $"{new string('-', 80)}");
 
             Conectado = OpenInternal();
@@ -76,10 +99,14 @@ namespace OpenAC.Net.Devices
             if (Config.ControlePorta && Conectado) CloseInternal();
         }
 
+        /// <summary>
+        /// Fecha a conexão
+        /// </summary>
         public void Close()
         {
             this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
-                            $"- Device: {GetType().Name}" + Environment.NewLine +
+                            $"Close - {DateTime.Now:G}" + Environment.NewLine +
+                            $"- Config: {Config.Name}" + Environment.NewLine +
                             $"{new string('-', 80)}");
 
             if (Config.ControlePorta && Conectado)
@@ -88,15 +115,30 @@ namespace OpenAC.Net.Devices
                 Conectado = false;
         }
 
+        /// <summary>
+        /// Limpa os dados do Buffer de leitura.
+        /// </summary>
         public virtual void Limpar()
         {
             //Limpar stream de leitura.
         }
 
+        /// <summary>
+        /// Abre a conexão internamente para o controle de porta.
+        /// </summary>
+        /// <returns></returns>
         protected abstract bool OpenInternal();
 
+        /// <summary>
+        /// Fecha a conexão internamente para o controle de porta.
+        /// </summary>
+        /// <returns></returns>
         protected abstract bool CloseInternal();
 
+        /// <summary>
+        /// Grava dados na porta de conexão.
+        /// </summary>
+        /// <param name="dados"></param>
         public void Write(byte[] dados)
         {
             if (dados.Length < 1) return;
@@ -105,7 +147,7 @@ namespace OpenAC.Net.Devices
             {
                 if (Config.ControlePorta) OpenInternal();
 
-                WriteInternal(Encoding.Convert(Encoding.UTF8, Config.Encoding, dados));
+                Writer.Write(Encoding.Convert(Encoding.UTF8, Config.Encoding, dados), 0, dados.Length);
             }
             finally
             {
@@ -113,14 +155,29 @@ namespace OpenAC.Net.Devices
             }
         }
 
+        /// <summary>
+        /// Le dados da porta de conexão
+        /// </summary>
+        /// <returns></returns>
         public byte[] Read()
         {
             try
             {
                 if (Config.ControlePorta) OpenInternal();
 
-                var dados = ReadInternal();
-                return !dados.Any() ? dados : Encoding.Convert(Config.Encoding, Encoding.UTF8, dados);
+                var ret = new List<byte>();
+
+                while (Available > 0)
+                {
+                    var inbyte = new byte[1];
+                    Reader.Read(inbyte, 0, 1);
+                    if (inbyte.Length < 1) continue;
+
+                    var value = (byte)inbyte.GetValue(0);
+                    ret.Add(value);
+                }
+
+                return !ret.Any() ? new byte[0] : Encoding.Convert(Config.Encoding, Encoding.UTF8, ret.ToArray());
             }
             finally
             {
@@ -128,12 +185,71 @@ namespace OpenAC.Net.Devices
             }
         }
 
-        protected abstract void WriteInternal(byte[] dados);
+        /// <summary>
+        /// Função executa no dispose da classe.
+        /// </summary>
+        protected virtual void OnDisposing()
+        {
+        }
 
-        protected abstract byte[] ReadInternal();
+        /// <summary>
+        /// Metodo responsavel pelo dispose da classe de comunicação.
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected void Dispose(bool disposing)
+        {
+            if (disposed) return;
 
-        protected abstract void Dispose(bool disposing);
+            if (disposing)
+            {
+                try
+                {
+                    Reader?.Close();
+                }
+                catch (Exception e)
+                {
+                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing reader.", e);
+                }
+                try
+                {
+                    Reader?.Dispose();
+                }
+                catch (Exception e)
+                {
+                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing reader.", e);
+                }
+                try
+                {
+                    Writer?.Close();
+                }
+                catch (Exception e)
+                {
+                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing writer.", e);
+                }
+                try
+                {
+                    Writer?.Dispose();
+                }
+                catch (Exception e)
+                {
+                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing writer.", e);
+                }
+                try
+                {
+                    OnDisposing();
+                }
+                catch (Exception e)
+                {
+                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue during overridable dispose.", e);
+                }
+            }
 
+            disposed = true;
+        }
+
+        /// <summary>
+        /// Implementação da interface IDisposable
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);

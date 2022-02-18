@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="DeviceExtensions.cs" company="OpenAC .Net">
+// <copyright file="EventHandlerExtension.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,21 +29,52 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Text;
+using System.ComponentModel;
 
 namespace OpenAC.Net.Devices
 {
-    public static class DeviceExtensions
+    public static class EventHandlerExtension
     {
-        public static void WriteString(this OpenDeviceStream device, string dados)
+        /// <summary>
+        /// Chama o evento.
+        /// </summary>
+        /// <param name="eventHandler">The event handler.</param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The e.</param>
+        public static void Raise(this PropertyChangingEventHandler eventHandler, object sender, PropertyChangingEventArgs e)
         {
-            device.Write(Encoding.UTF8.GetBytes(dados));
+            if (eventHandler == null)
+                return;
+
+            if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
+            {
+                synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
+            }
+            else
+            {
+                eventHandler.DynamicInvoke(sender, e);
+            }
         }
 
-        public static string ReadString(this OpenDeviceStream device)
+        /// <summary>
+        /// Chama o evento.
+        /// </summary>
+        /// <param name="eventHandler">The event handler.</param>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The e.</param>
+        public static void Raise(this PropertyChangedEventHandler eventHandler, object sender, PropertyChangedEventArgs e)
         {
-            var dados = device.Read();
-            return Encoding.UTF8.GetString(dados);
+            if (eventHandler == null)
+                return;
+
+            if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
+            {
+                synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
+            }
+            else
+            {
+                eventHandler.DynamicInvoke(sender, e);
+            }
         }
     }
 }

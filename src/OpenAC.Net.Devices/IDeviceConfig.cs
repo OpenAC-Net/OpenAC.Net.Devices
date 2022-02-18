@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="DeviceExtensions.cs" company="OpenAC .Net">
+// <copyright file="IDeviceConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -33,17 +33,51 @@ using System.Text;
 
 namespace OpenAC.Net.Devices
 {
-    public static class DeviceExtensions
+    /// <summary>
+    /// Interface para implementação das configurações da classe de comunicação.
+    /// </summary>
+    public interface IDeviceConfig
     {
-        public static void WriteString(this OpenDeviceStream device, string dados)
-        {
-            device.Write(Encoding.UTF8.GetBytes(dados));
-        }
+        /// <summary>
+        /// Retorna o nome do dispositivo desta configuração.
+        /// </summary>
+        string Name { get; }
 
-        public static string ReadString(this OpenDeviceStream device)
-        {
-            var dados = device.Read();
-            return Encoding.UTF8.GetString(dados);
-        }
+        /// <summary>
+        /// Retorna/define se o controle da porta será feito de forma automatica.
+        /// </summary>
+        bool ControlePorta { get; set; }
+
+        /// <summary>
+        /// Retorna/define o encoding usado na comunicação.
+        /// </summary>
+        Encoding Encoding { get; set; }
+
+        /// <summary>
+        /// Retorna/define o timeout da conexão.
+        /// </summary>
+        int TimeOut { get; set; }
+
+        /// <summary>
+        /// Retorna/define o número de tentativas de conexão.
+        /// </summary>
+        int Tentativas { get; set; }
+
+        /// <summary>
+        /// Retorna/define o intervalo entre as tentativas de conexão.
+        /// </summary>
+        int IntervaloTentativas { get; set; }
+
+        /// <summary>
+        /// Retorna/define o tamanho do buffer de leitura.
+        /// </summary>
+
+        int ReadBufferSize { get; set; }
+
+        /// <summary>
+        /// Retorna/define o tamanho do buffer de escrita.
+        /// </summary>
+
+        int WriteBufferSize { get; set; }
     }
 }

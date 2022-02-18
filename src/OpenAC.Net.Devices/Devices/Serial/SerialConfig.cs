@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenDeviceConfig.cs" company="OpenAC .Net">
+// <copyright file="SerialConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -30,26 +30,16 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO.Ports;
-using System.Reflection;
-using System.Runtime.CompilerServices;
+using System.Linq;
 using System.Text;
 using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    public class OpenDeviceConfig : INotifyPropertyChanged
+    public class SerialConfig : NotifyPropertyChanges, IDeviceConfig
     {
-        #region Events
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion Events
-
         #region Fields
 
         private string porta;
@@ -65,12 +55,13 @@ namespace OpenAC.Net.Devices
         private int intervaloTentativas;
         private int readBufferSize;
         private int writeBufferSize;
+        private readonly string[] validPorts = { "COM", "LPT" };
 
         #endregion Fields
 
         #region Constructor
 
-        protected OpenDeviceConfig()
+        protected SerialConfig()
         {
             ControlePorta = true;
             Encoding = OpenEncoding.IBM860;
@@ -91,25 +82,33 @@ namespace OpenAC.Net.Devices
 
         #region Properties
 
+        /// <inheritdoc />
+        public string Name => "Serial";
+
+        /// <inheritdoc />
         public bool ControlePorta
         {
             get => controlePorta;
             set => SetProperty(ref controlePorta, value);
         }
 
-        [Browsable(false)]
+        /// <inheritdoc />
         public Encoding Encoding
         {
             get => encoding;
             set => SetProperty(ref encoding, value);
         }
 
+        /// <summary>
+        /// Retorna/define o nome da porta serial para a conexão.
+        /// </summary>
+        /// <exception cref="ArgumentException"></exception>
         public string Porta
         {
             get => porta;
             set
             {
-                if (!OpenDeviceManager.IsValidPort(value)) throw new ArgumentException("Porta ínvalida.");
+                if (!IsValidPort(value)) throw new ArgumentException("Porta ínvalida.");
                 if (!SetProperty(ref porta, value)) return;
             }
         }
@@ -178,40 +177,8 @@ namespace OpenAC.Net.Devices
 
         #region Methods
 
-        /// <summary>
-        /// Sets the value of the property to the specified value if it has changed.
-        /// </summary>
-        /// <typeparam name="TProp">The type of the property.</typeparam>
-        /// <param name="currentValue">The current value of the property.</param>
-        /// <param name="newValue">The new value of the property.</param>
-        /// <param name="propertyName">Name of the property.</param>
-        /// <returns><c>true</c> if the property was changed, otherwise <c>false</c>.</returns>
-        private bool SetProperty<TProp>(
-            ref TProp currentValue,
-            TProp newValue,
-            [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<TProp>.Default.Equals(currentValue, newValue)) return false;
-
-            currentValue = newValue;
-            OnPropertyChanged(propertyName);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Raises the PropertyChanged event.
-        /// </summary>
-        /// <param name="propertyName">Name of the property.</param>
-        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            Debug.Assert(
-                string.IsNullOrEmpty(propertyName) ||
-                (GetType().GetRuntimeProperty(propertyName) != null),
-                "Check that the property name exists for this instance.");
-
-            PropertyChanged.Raise(this, new PropertyChangedEventArgs(propertyName));
-        }
+        /// <inheritdoc />
+        private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && validPorts.Any(p => aPorta.ToUpper().StartsWith(p));
 
         #endregion Methods
     }

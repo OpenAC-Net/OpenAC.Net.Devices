@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenDeviceManager.cs" company="OpenAC .Net">
+// <copyright file="OpenDeviceFactory.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -36,69 +36,61 @@ using OpenAC.Net.Core;
 
 namespace OpenAC.Net.Devices
 {
-    public static class OpenDeviceManager
+    /// <summary>
+    /// Classe para gerenciar os tipos de comunicação.
+    /// </summary>
+    public static class OpenDeviceFactory
     {
         #region Fields
 
-        private static readonly Dictionary<string, Type> communications;
+        private static readonly Dictionary<Type, Type> Communications;
 
         #endregion Fields
 
         #region Constructors
 
-        static OpenDeviceManager()
+        static OpenDeviceFactory()
         {
-            communications = new Dictionary<string, Type>
+            Communications = new Dictionary<Type, Type>
             {
-                {"LPT", typeof(OpenSerialStream)},
-                {"COM", typeof(OpenSerialStream)},
-                {"TCP", typeof(OpenTcpStream)},
-#if NETFULL
-                // Precisa ser ajustada para ser usado no linux.
-                {"RAW", typeof(OpenRawStream)},
-                // Ainda em desenvolvimento
-                {"USB", typeof(OpenUSBStream)},
-#endif
+                {typeof(SerialConfig), typeof(OpenSerialStream)},
+                {typeof(TCPConfig), typeof(OpenTcpStream)},
+                {typeof(RawConfig), typeof(OpenRawStream)}
             };
         }
 
         #endregion Constructors
 
+        #region Methods
+
         /// <summary>
         /// Registrar uma nova classe de comunicação
         /// </summary>
-        /// <param name="tag"></param>
-        /// <typeparam name="T"></typeparam>
-        public static void Register<T>(string tag) where T : OpenDeviceStream
+        /// <typeparam name="TConfig">Classe de configuração da classe device sendo registrada.</typeparam>
+        /// <typeparam name="TDevice">Classe de comunicação a ser registrada</typeparam>
+        public static void Register<TConfig, TDevice>()
+            where TConfig : IDeviceConfig
+            where TDevice : OpenDeviceStream
         {
-            communications.Add(tag, typeof(T));
+            Communications.Add(typeof(TConfig), typeof(TDevice));
         }
 
         /// <summary>
-        /// Função para checar se a porta é valida
-        /// </summary>
-        /// <param name="porta"></param>
-        /// <returns></returns>
-        public static bool IsValidPort(string porta)
-        {
-            return (from c in communications
-                    where porta.ToUpper().StartsWith(c.Key)
-                    select c.Value).Any();
-        }
-
-        /// <summary>
-        /// Retorna a classe para comunicação
+        /// Retorna a classe para comunicação de acordo com a configuração informada.
         /// </summary>
         /// <param name="config"></param>
         /// <returns></returns>
-        public static OpenDeviceStream GetCommunication(OpenDeviceConfig config)
+        public static OpenDeviceStream Create(IDeviceConfig config)
         {
-            var communication = (from c in communications
-                                 where config.Porta.ToUpper().StartsWith(c.Key)
-                                 select c.Value).FirstOrDefault();
+            var configType = config.GetType();
+            var device = (from c in Communications
+                          where c.Key == configType || configType.IsAssignableFrom(c.Key)
+                          select c.Value).FirstOrDefault();
 
-            Guard.Against<OpenException>(communication == null, "Classe de comunicação não localizada.");
-            return (OpenDeviceStream)Activator.CreateInstance(communication, config);
+            Guard.Against<OpenException>(device == null, "Classe de comunicação não localizada.");
+            return (OpenDeviceStream)Activator.CreateInstance(device, config);
         }
+
+        #endregion Methods
     }
 }

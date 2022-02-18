@@ -29,9 +29,9 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-using System.Collections.Generic;
+using System.IO;
 using System.IO.Ports;
+using System.Threading.Tasks;
 
 namespace OpenAC.Net.Devices
 {
@@ -45,12 +45,18 @@ namespace OpenAC.Net.Devices
 
         #region Constructor
 
-        public OpenSerialStream(OpenDeviceConfig config) : base(config)
+        public OpenSerialStream(SerialConfig config) : base(config)
         {
             serialPort = new SerialPort();
         }
 
         #endregion Constructor
+
+        #region Properties
+
+        protected override int Available => serialPort?.BytesToRead ?? 0;
+
+        #endregion Properties
 
         #region Methods
 
@@ -66,6 +72,9 @@ namespace OpenAC.Net.Devices
             ConfigSerial();
             serialPort.Open();
 
+            Reader = new BinaryReader(serialPort.BaseStream);
+            Writer = new BinaryWriter(serialPort.BaseStream);
+
             return serialPort.IsOpen;
         }
 
@@ -74,57 +83,41 @@ namespace OpenAC.Net.Devices
             if (!serialPort.IsOpen) return false;
 
             serialPort.Close();
+            Reader?.Dispose();
+            Writer?.Dispose();
+
+            Reader = null;
+            Writer = null;
 
             return !serialPort.IsOpen;
         }
 
-        protected override void WriteInternal(byte[] dados)
-        {
-            if (dados.Length < 1) return;
-
-            serialPort.Write(dados, 0, dados.Length);
-        }
-
-        protected override byte[] ReadInternal()
-        {
-            var ret = new List<byte>();
-            while (serialPort.BytesToRead > 0)
-            {
-                var inbyte = new byte[1];
-                serialPort.Read(inbyte, 0, 1);
-                if (inbyte.Length < 1) continue;
-
-                var value = (byte)inbyte.GetValue(0);
-                ret.Add(value);
-            }
-
-            return ret.ToArray();
-        }
-
         private void ConfigSerial()
         {
-            serialPort.PortName = Config.Porta;
-            serialPort.BaudRate = Config.Baud;
-            serialPort.DataBits = Config.DataBits;
-            serialPort.Parity = Config.Parity;
-            serialPort.StopBits = Config.StopBits;
-            serialPort.Handshake = Config.Handshake;
-            serialPort.ReadTimeout = Config.TimeOut;
-            serialPort.WriteTimeout = Config.TimeOut;
-            serialPort.ReadBufferSize = Config.ReadBufferSize;
-            serialPort.WriteBufferSize = Config.WriteBufferSize;
-            serialPort.Encoding = Config.Encoding;
+            if (Config is not SerialConfig config) return;
+
+            serialPort.PortName = config.Porta;
+            serialPort.BaudRate = config.Baud;
+            serialPort.DataBits = config.DataBits;
+            serialPort.Parity = config.Parity;
+            serialPort.StopBits = config.StopBits;
+            serialPort.Handshake = config.Handshake;
+            serialPort.ReadTimeout = config.TimeOut;
+            serialPort.WriteTimeout = config.TimeOut;
+            serialPort.ReadBufferSize = config.ReadBufferSize;
+            serialPort.WriteBufferSize = config.WriteBufferSize;
+            serialPort.Encoding = config.Encoding;
         }
 
         #endregion Methods
 
         #region Dispose Methods
 
-        protected override void Dispose(bool disposing)
+        protected override void OnDisposing()
         {
-            if (disposing) GC.SuppressFinalize(this);
-
+            serialPort?.Close();
             serialPort?.Dispose();
+            Task.Delay(250).Wait();
         }
 
         #endregion Dispose Methods
