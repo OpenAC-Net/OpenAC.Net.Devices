@@ -147,7 +147,8 @@ namespace OpenAC.Net.Devices
             {
                 if (Config.ControlePorta) OpenInternal();
 
-                Writer.Write(Encoding.Convert(Encoding.UTF8, Config.Encoding, dados), 0, dados.Length);
+                var send = Encoding.Convert(Encoding.UTF8, Config.Encoding, dados);
+                Writer.Write(send, 0, send.Length);
             }
             finally
             {

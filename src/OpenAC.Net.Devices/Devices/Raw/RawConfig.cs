@@ -50,6 +50,10 @@ namespace OpenAC.Net.Devices
 
         #region Constructors
 
+        public RawConfig()
+        {
+        }
+
         public RawConfig(string impressora)
         {
             this.impressora = impressora;

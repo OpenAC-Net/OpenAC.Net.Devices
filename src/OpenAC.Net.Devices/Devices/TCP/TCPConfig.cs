@@ -30,6 +30,7 @@
 // ***********************************************************************
 
 using System.Text;
+using OpenAC.Net.Core;
 
 namespace OpenAC.Net.Devices
 {
@@ -51,7 +52,12 @@ namespace OpenAC.Net.Devices
 
         #region Constructors
 
-        public TCPConfig(string ip, int porta)
+        public TCPConfig()
+        {
+            Encoding = OpenEncoding.IBM860;
+        }
+
+        public TCPConfig(string ip, int porta) : this()
         {
             this.ip = ip;
             this.porta = porta;
