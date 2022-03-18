@@ -61,7 +61,7 @@ namespace OpenAC.Net.Devices
 
         #region Constructor
 
-        protected SerialConfig()
+        public SerialConfig()
         {
             ControlePorta = true;
             Encoding = OpenEncoding.IBM860;
