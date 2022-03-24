@@ -32,39 +32,28 @@
 using System;
 using System.IO.Ports;
 using System.Linq;
-using System.Text;
-using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    public class SerialConfig : NotifyPropertyChanges, IDeviceConfig
+    public class SerialConfig : BaseConfig
     {
         #region Fields
 
         private string porta;
-        private bool controlePorta;
-        private Encoding encoding;
         private int baud;
         private int dataBits;
         private Parity parity;
         private StopBits stopBits;
         private Handshake handshake;
-        private int timeOut;
-        private int tentativas;
-        private int intervaloTentativas;
-        private int readBufferSize;
-        private int writeBufferSize;
         private readonly string[] validPorts = { "COM", "LPT" };
 
         #endregion Fields
 
         #region Constructor
 
-        public SerialConfig()
+        public SerialConfig() : base("Serial")
         {
-            ControlePorta = true;
-            Encoding = OpenEncoding.IBM860;
             Porta = "COM1";
             Baud = 9600;
             DataBits = 8;
@@ -73,31 +62,11 @@ namespace OpenAC.Net.Devices
             WriteBufferSize = 2048;
             ReadBufferSize = 4096;
             Handshake = Handshake.None;
-            TimeOut = 3;
-            Tentativas = 3;
-            IntervaloTentativas = 3000;
         }
 
         #endregion Constructor
 
         #region Properties
-
-        /// <inheritdoc />
-        public string Name => "Serial";
-
-        /// <inheritdoc />
-        public bool ControlePorta
-        {
-            get => controlePorta;
-            set => SetProperty(ref controlePorta, value);
-        }
-
-        /// <inheritdoc />
-        public Encoding Encoding
-        {
-            get => encoding;
-            set => SetProperty(ref encoding, value);
-        }
 
         /// <summary>
         /// Retorna/define o nome da porta serial para a conexão.
@@ -141,36 +110,6 @@ namespace OpenAC.Net.Devices
         {
             get => handshake;
             set => SetProperty(ref handshake, value);
-        }
-
-        public int TimeOut
-        {
-            get => timeOut;
-            set => SetProperty(ref timeOut, value);
-        }
-
-        public int Tentativas
-        {
-            get => tentativas;
-            set => SetProperty(ref tentativas, value);
-        }
-
-        public int IntervaloTentativas
-        {
-            get => intervaloTentativas;
-            set => SetProperty(ref intervaloTentativas, value);
-        }
-
-        public int ReadBufferSize
-        {
-            get => readBufferSize;
-            set => SetProperty(ref readBufferSize, value);
-        }
-
-        public int WriteBufferSize
-        {
-            get => writeBufferSize;
-            set => SetProperty(ref writeBufferSize, value);
         }
 
         #endregion Properties

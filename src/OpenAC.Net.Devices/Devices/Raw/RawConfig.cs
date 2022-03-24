@@ -33,28 +33,21 @@ using System.Text;
 
 namespace OpenAC.Net.Devices
 {
-    public sealed class RawConfig : NotifyPropertyChanges, IDeviceConfig
+    public sealed class RawConfig : BaseConfig
     {
         #region Fields
 
         private string impressora;
-        private bool controlePorta;
-        private Encoding encoding;
-        private int timeOut;
-        private int tentativas;
-        private int intervaloTentativas;
-        private int readBufferSize;
-        private int writeBufferSize;
 
         #endregion Fields
 
         #region Constructors
 
-        public RawConfig()
+        public RawConfig() : base("RAW")
         {
         }
 
-        public RawConfig(string impressora)
+        public RawConfig(string impressora) : this()
         {
             this.impressora = impressora;
         }
@@ -63,54 +56,10 @@ namespace OpenAC.Net.Devices
 
         #region Properties
 
-        public string Name => "Raw";
-
         public string Impressora
         {
             get => impressora;
             set => SetProperty(ref impressora, value);
-        }
-
-        public bool ControlePorta
-        {
-            get => controlePorta;
-            set => SetProperty(ref controlePorta, value);
-        }
-
-        public Encoding Encoding
-        {
-            get => encoding;
-            set => SetProperty(ref encoding, value);
-        }
-
-        public int TimeOut
-        {
-            get => timeOut;
-            set => SetProperty(ref timeOut, value);
-        }
-
-        public int Tentativas
-        {
-            get => tentativas;
-            set => SetProperty(ref tentativas, value);
-        }
-
-        public int IntervaloTentativas
-        {
-            get => intervaloTentativas;
-            set => SetProperty(ref intervaloTentativas, value);
-        }
-
-        public int ReadBufferSize
-        {
-            get => readBufferSize;
-            set => SetProperty(ref readBufferSize, value);
-        }
-
-        public int WriteBufferSize
-        {
-            get => writeBufferSize;
-            set => SetProperty(ref writeBufferSize, value);
         }
 
         #endregion Properties

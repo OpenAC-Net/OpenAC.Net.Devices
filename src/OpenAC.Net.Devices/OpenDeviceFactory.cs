@@ -55,7 +55,8 @@ namespace OpenAC.Net.Devices
             {
                 {typeof(SerialConfig), typeof(OpenSerialStream)},
                 {typeof(TCPConfig), typeof(OpenTcpStream)},
-                {typeof(RawConfig), typeof(OpenRawStream)}
+                {typeof(RawConfig), typeof(OpenRawStream)},
+                {typeof(FileConfig), typeof(OpenFileStream)}
             };
         }
 

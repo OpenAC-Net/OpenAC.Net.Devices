@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="DeviceExtensions.cs" company="OpenAC .Net">
+// <copyright file="FileConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -33,17 +33,42 @@ using System.Text;
 
 namespace OpenAC.Net.Devices
 {
-    public static class DeviceExtensions
+    public sealed class FileConfig : BaseConfig
     {
-        public static void WriteString(this OpenDeviceStream device, string dados)
+        #region Fields
+
+        private string file;
+        private bool createIfNotExits;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public FileConfig() : base("File")
         {
-            device.Write(Encoding.UTF8.GetBytes(dados));
         }
 
-        public static string ReadString(this OpenDeviceStream device)
+        public FileConfig(string file) : this()
         {
-            var dados = device.Read();
-            return Encoding.UTF8.GetString(dados);
+            this.file = file;
         }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public string File
+        {
+            get => file;
+            set => SetProperty(ref file, value);
+        }
+
+        public bool CreateIfNotExits
+        {
+            get => createIfNotExits;
+            set => SetProperty(ref createIfNotExits, value);
+        }
+
+        #endregion Properties
     }
 }

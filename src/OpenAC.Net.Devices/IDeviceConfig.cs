@@ -49,11 +49,6 @@ namespace OpenAC.Net.Devices
         bool ControlePorta { get; set; }
 
         /// <summary>
-        /// Retorna/define o encoding usado na comunicação.
-        /// </summary>
-        Encoding Encoding { get; set; }
-
-        /// <summary>
         /// Retorna/define o timeout da conexão.
         /// </summary>
         int TimeOut { get; set; }

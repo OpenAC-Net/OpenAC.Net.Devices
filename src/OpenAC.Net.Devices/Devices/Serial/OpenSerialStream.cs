@@ -106,7 +106,6 @@ namespace OpenAC.Net.Devices
             serialPort.WriteTimeout = config.TimeOut;
             serialPort.ReadBufferSize = config.ReadBufferSize;
             serialPort.WriteBufferSize = config.WriteBufferSize;
-            serialPort.Encoding = config.Encoding;
         }
 
         #endregion Methods

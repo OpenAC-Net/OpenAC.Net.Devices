@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="TCPConfig.cs" company="OpenAC .Net">
+// <copyright file="OpenFileStream.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,54 +29,68 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Text;
+using System;
+using System.IO;
+using OpenAC.Net.Core;
+using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    public sealed class TCPConfig : BaseConfig
+    internal sealed class OpenFileStream : OpenDeviceStream
     {
         #region Fields
 
-        private bool controlePorta = true;
-        private Encoding encoding = Encoding.UTF8;
-        private int timeOut;
-        private int tentativas;
-        private int intervaloTentativas;
-        private int readBufferSize;
-        private int writeBufferSize;
-        private string ip;
-        private int porta;
+        private FileStream client;
 
         #endregion Fields
 
-        #region Constructors
+        #region Constructor
 
-        public TCPConfig() : base("TCP")
+        public OpenFileStream(FileConfig config) : base(config)
         {
+            Guard.Against<ArgumentException>(config.File.IsEmpty(), "Arquivo não informado.");
         }
 
-        public TCPConfig(string ip, int porta) : this()
-        {
-            this.ip = ip;
-            this.porta = porta;
-        }
-
-        #endregion Constructors
+        #endregion Constructor
 
         #region Properties
 
-        public string IP
-        {
-            get => ip;
-            set => SetProperty(ref ip, value);
-        }
-
-        public int Porta
-        {
-            get => porta;
-            set => SetProperty(ref porta, value);
-        }
+        protected override int Available => 0;
 
         #endregion Properties
+
+        #region Methods
+
+        protected override bool OpenInternal()
+        {
+            if (client != null) return false;
+            if (Config is not FileConfig config) return false;
+
+            client = File.Open(config.File, config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
+            Writer = new BinaryWriter(client);
+
+            return true;
+        }
+
+        protected override bool CloseInternal()
+        {
+            if (client == null) return false;
+
+            client?.Dispose();
+            Writer?.Dispose();
+
+            Writer = null;
+            client = null;
+
+            return true;
+        }
+
+        #endregion Methods
+
+        #region Dispose Methods
+
+        protected override void OnDisposing() => client?.Dispose();
+
+        #endregion Dispose Methods
     }
 }

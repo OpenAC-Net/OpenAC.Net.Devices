@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="NotifyPropertyChanges.cs" company="OpenAC .Net">
+// <copyright file="BaseConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -35,12 +35,22 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    public abstract class NotifyPropertyChanges : INotifyPropertyChanged, INotifyPropertyChanging
+    public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChanging, IDeviceConfig
     {
+        #region Fields
+
+        private bool controlePorta = true;
+        private int timeOut;
+        private int tentativas;
+        private int intervaloTentativas;
+        private int readBufferSize;
+        private int writeBufferSize;
+
+        #endregion Fields
+
         #region Public Events
 
         /// <summary>
@@ -54,6 +64,63 @@ namespace OpenAC.Net.Devices
         public event PropertyChangedEventHandler PropertyChanged;
 
         #endregion Public Events
+
+        #region Constructors
+
+        protected BaseConfig(string name)
+        {
+            Name = name;
+            ControlePorta = true;
+            timeOut = 3;
+            tentativas = 3;
+            intervaloTentativas = 3000;
+            readBufferSize = 200;
+            writeBufferSize = 3000;
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        public string Name { get; }
+
+        public bool ControlePorta
+        {
+            get => controlePorta;
+            set => SetProperty(ref controlePorta, value);
+        }
+
+        public int TimeOut
+        {
+            get => timeOut;
+            set => SetProperty(ref timeOut, Math.Max(value, 1));
+        }
+
+        public int Tentativas
+        {
+            get => tentativas;
+            set => SetProperty(ref tentativas, Math.Max(value, 1));
+        }
+
+        public int IntervaloTentativas
+        {
+            get => intervaloTentativas;
+            set => SetProperty(ref intervaloTentativas, Math.Max(value, 1));
+        }
+
+        public int ReadBufferSize
+        {
+            get => readBufferSize;
+            set => SetProperty(ref readBufferSize, Math.Max(value, 1));
+        }
+
+        public int WriteBufferSize
+        {
+            get => writeBufferSize;
+            set => SetProperty(ref writeBufferSize, Math.Max(value, 1));
+        }
+
+        #endregion Properties
 
         #region Protected Methods
 

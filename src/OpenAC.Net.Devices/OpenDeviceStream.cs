@@ -30,12 +30,11 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
+using System.Threading;
 using OpenAC.Net.Core.Logging;
+using OpenAC.Net.Devices.Commom;
 
 namespace OpenAC.Net.Devices
 {
@@ -71,6 +70,10 @@ namespace OpenAC.Net.Devices
         #region Properties
 
         public IDeviceConfig Config { get; }
+
+        public bool CanRead => Reader != null;
+
+        public bool CanWrite => Writer != null;
 
         public bool Conectado { get; protected set; }
 
@@ -147,8 +150,33 @@ namespace OpenAC.Net.Devices
             {
                 if (Config.ControlePorta) OpenInternal();
 
-                var send = Encoding.Convert(Encoding.UTF8, Config.Encoding, dados);
-                Writer.Write(send, 0, send.Length);
+                var bytePointer = 0;
+                var bytesLeft = dados.Length;
+                var tentativas = 0;
+                while (bytesLeft > 0)
+                {
+                    var count = Math.Min(Config.WriteBufferSize, bytesLeft);
+
+                    try
+                    {
+                        Writer.Write(dados, bytePointer, count);
+                    }
+                    catch (IOException ex)
+                    {
+                        this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
+                        tentativas++;
+                        if (tentativas >= Config.Tentativas) throw;
+
+                        Thread.Sleep(Config.IntervaloTentativas);
+
+                        CloseInternal();
+                        OpenInternal();
+                        Writer.Write(dados, bytePointer, count);
+                    }
+
+                    bytePointer += count;
+                    bytesLeft -= count;
+                }
             }
             finally
             {
@@ -166,19 +194,35 @@ namespace OpenAC.Net.Devices
             {
                 if (Config.ControlePorta) OpenInternal();
 
-                var ret = new List<byte>();
+                var ret = new ByteArrayBuilder();
+                var bufferSize = Math.Max(Config.ReadBufferSize, 1);
+                var tentativas = 0;
 
                 while (Available > 0)
                 {
-                    var inbyte = new byte[1];
-                    Reader.Read(inbyte, 0, 1);
-                    if (inbyte.Length < 1) continue;
+                    try
+                    {
+                        var inbyte = new byte[bufferSize];
+                        var read = Reader.Read(inbyte, 0, bufferSize);
+                        if (read < 1) continue;
 
-                    var value = (byte)inbyte.GetValue(0);
-                    ret.Add(value);
+                        var value = (byte)inbyte.GetValue(0);
+                        ret.Append(value);
+                    }
+                    catch (IOException ex)
+                    {
+                        this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
+                        tentativas++;
+                        if (tentativas >= Config.Tentativas) throw;
+
+                        Thread.Sleep(Config.IntervaloTentativas);
+
+                        CloseInternal();
+                        OpenInternal();
+                    }
                 }
 
-                return !ret.Any() ? new byte[0] : Encoding.Convert(Config.Encoding, Encoding.UTF8, ret.ToArray());
+                return ret.ToArray();
             }
             finally
             {
