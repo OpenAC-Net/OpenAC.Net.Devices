@@ -38,7 +38,7 @@ using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    internal sealed class OpenTcpStream : OpenDeviceStream
+    internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
     {
         #region Fields
 
@@ -115,7 +115,11 @@ namespace OpenAC.Net.Devices
 
         #region Dispose Methods
 
-        protected override void OnDisposing() => ((IDisposable)client)?.Dispose();
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+            ((IDisposable)client)?.Dispose();
+        }
 
         #endregion Dispose Methods
     }

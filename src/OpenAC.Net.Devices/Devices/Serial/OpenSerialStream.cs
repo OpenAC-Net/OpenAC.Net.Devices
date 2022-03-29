@@ -35,7 +35,7 @@ using System.Threading.Tasks;
 
 namespace OpenAC.Net.Devices
 {
-    internal sealed class OpenSerialStream : OpenDeviceStream
+    internal sealed class OpenSerialStream : OpenDeviceStream<SerialConfig>
     {
         #region Fields
 
@@ -94,26 +94,25 @@ namespace OpenAC.Net.Devices
 
         private void ConfigSerial()
         {
-            if (Config is not SerialConfig config) return;
-
-            serialPort.PortName = config.Porta;
-            serialPort.BaudRate = config.Baud;
-            serialPort.DataBits = config.DataBits;
-            serialPort.Parity = config.Parity;
-            serialPort.StopBits = config.StopBits;
-            serialPort.Handshake = config.Handshake;
-            serialPort.ReadTimeout = config.TimeOut;
-            serialPort.WriteTimeout = config.TimeOut;
-            serialPort.ReadBufferSize = config.ReadBufferSize;
-            serialPort.WriteBufferSize = config.WriteBufferSize;
+            serialPort.PortName = Config.Porta;
+            serialPort.BaudRate = Config.Baud;
+            serialPort.DataBits = Config.DataBits;
+            serialPort.Parity = Config.Parity;
+            serialPort.StopBits = Config.StopBits;
+            serialPort.Handshake = Config.Handshake;
+            serialPort.ReadTimeout = Config.TimeOut;
+            serialPort.WriteTimeout = Config.TimeOut;
+            serialPort.ReadBufferSize = Config.ReadBufferSize;
+            serialPort.WriteBufferSize = Config.WriteBufferSize;
         }
 
         #endregion Methods
 
         #region Dispose Methods
 
-        protected override void OnDisposing()
+        protected override void DisposeManaged()
         {
+            base.DisposeManaged();
             serialPort?.Close();
             serialPort?.Dispose();
             Task.Delay(250).Wait();

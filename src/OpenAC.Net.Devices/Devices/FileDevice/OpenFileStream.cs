@@ -36,7 +36,7 @@ using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices
 {
-    internal sealed class OpenFileStream : OpenDeviceStream
+    internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
     {
         #region Fields
 
@@ -64,9 +64,8 @@ namespace OpenAC.Net.Devices
         protected override bool OpenInternal()
         {
             if (client != null) return false;
-            if (Config is not FileConfig config) return false;
 
-            client = File.Open(config.File, config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
+            client = File.Open(Config.File, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
             Writer = new BinaryWriter(client);
 
             return true;
@@ -89,7 +88,11 @@ namespace OpenAC.Net.Devices
 
         #region Dispose Methods
 
-        protected override void OnDisposing() => client?.Dispose();
+        protected override void DisposeManaged()
+        {
+            base.DisposeManaged();
+            client?.Dispose();
+        }
 
         #endregion Dispose Methods
     }

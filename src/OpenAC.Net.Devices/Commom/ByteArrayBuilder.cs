@@ -31,6 +31,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -69,19 +70,10 @@ namespace OpenAC.Net.Devices.Commom
     ///        }
     ///     .
     /// </example>
+    //[DebuggerDisplay("")]
     public class ByteArrayBuilder : IDisposable
     {
         #region Fields
-
-        /// <summary>
-        /// True in a byte form of the Line.
-        /// </summary>
-        private const byte StreamTrue = (byte)1;
-
-        /// <summary>
-        /// False in the byte form of a line.
-        /// </summary>
-        private const byte StreamFalse = (byte)0;
 
         /// <summary>
         /// Holds the actual bytes.
@@ -114,7 +106,7 @@ namespace OpenAC.Net.Devices.Commom
 
         public ByteArrayBuilder Append(byte b)
         {
-            AddBytes(new byte[] { b });
+            AddBytes(new[] { b });
             return this;
         }
 
@@ -124,9 +116,9 @@ namespace OpenAC.Net.Devices.Commom
         /// <param name="b">Value to append to existing builder data.</param>
         public ByteArrayBuilder Append(IEnumerable<byte> b)
         {
-            if (b is byte[])
+            if (b is byte[] enumerable)
             {
-                AddBytes((byte[])b);
+                AddBytes(enumerable);
                 return this;
             }
 
@@ -172,7 +164,7 @@ namespace OpenAC.Net.Devices.Commom
         /// <returns>An array.</returns>
         public byte[] ToArray()
         {
-            byte[] data = new byte[Length];
+            var data = new byte[Length];
             Array.Copy(store.GetBuffer(), data, Length);
             return data;
         }
@@ -202,15 +194,11 @@ namespace OpenAC.Net.Devices.Commom
         /// <returns>The byte array.</returns>
         private byte[] GetBytes(int length)
         {
-            byte[] data = new byte[length];
-            if (length > 0)
-            {
-                int read = store.Read(data, 0, length);
-                if (read != length)
-                {
-                    throw new ApplicationException("Buffer did not contain " + length + " bytes");
-                }
-            }
+            var data = new byte[length];
+            if (length <= 0) return data;
+
+            var read = store.Read(data, 0, length);
+            if (read != length) throw new ApplicationException("Buffer did not contain " + length + " bytes");
 
             return data;
         }

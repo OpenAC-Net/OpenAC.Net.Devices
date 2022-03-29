@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenRawStream.cs" company="OpenAC .Net">
+// <copyright file="OpenDeviceStream.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,55 +29,22 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System;
-using System.IO;
-
 namespace OpenAC.Net.Devices
 {
-    internal sealed class OpenRawStream : OpenDeviceStream<RawConfig>
+    public abstract class OpenDeviceStream<TConfig> : OpenDeviceStream where TConfig : IDeviceConfig
     {
-        #region Fields
+        #region Constructors
 
-        private readonly RawPrinterStream printer;
-
-        #endregion Fields
-
-        #region Constructor
-
-        public OpenRawStream(RawConfig config) : base(config)
+        protected OpenDeviceStream(TConfig config) : base(config)
         {
-            printer = new RawPrinterStream(config.Impressora);
         }
 
-        #endregion Constructor
+        #endregion Constructors
 
         #region Properties
 
-        protected override int Available => 0;
+        public new TConfig Config { get; }
 
         #endregion Properties
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            Writer = new BinaryWriter(printer);
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            Writer?.Dispose();
-            Writer = null;
-            return true;
-        }
-
-        protected override void DisposeManaged()
-        {
-            base.DisposeManaged();
-            printer?.Dispose();
-        }
-
-        #endregion Methods
     }
 }

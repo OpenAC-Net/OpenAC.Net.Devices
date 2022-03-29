@@ -33,6 +33,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading;
+using OpenAC.Net.Core;
 using OpenAC.Net.Core.Logging;
 using OpenAC.Net.Devices.Commom;
 
@@ -41,7 +42,7 @@ namespace OpenAC.Net.Devices
     /// <summary>
     /// Classe para comunicaçõ com dispositivos.
     /// </summary>
-    public abstract class OpenDeviceStream : IDisposable, IOpenLog
+    public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     {
         #region Fields
 
@@ -59,11 +60,6 @@ namespace OpenAC.Net.Devices
         {
             Config = config;
         }
-
-        /// <summary>
-        /// Destructor da classe
-        /// </summary>
-        ~OpenDeviceStream() => Dispose(false);
 
         #endregion Constructors
 
@@ -185,6 +181,86 @@ namespace OpenAC.Net.Devices
         }
 
         /// <summary>
+        /// Grava e le o retorno da porta de conexão.
+        /// </summary>
+        /// <param name="dados"></param>
+        /// <param name="timeSleep"></param>
+        /// <returns></returns>
+        public byte[] WriteRead(byte[] dados, int timeSleep)
+        {
+            if (dados.Length < 1) return new byte[0];
+
+            try
+            {
+                if (Config.ControlePorta) OpenInternal();
+
+                var bytePointer = 0;
+                var bytesLeft = dados.Length;
+                var tentativas = 0;
+                while (bytesLeft > 0)
+                {
+                    var count = Math.Min(Config.WriteBufferSize, bytesLeft);
+
+                    try
+                    {
+                        Writer.Write(dados, bytePointer, count);
+                    }
+                    catch (IOException ex)
+                    {
+                        this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
+                        tentativas++;
+                        if (tentativas >= Config.Tentativas) throw;
+
+                        Thread.Sleep(Config.IntervaloTentativas);
+
+                        CloseInternal();
+                        OpenInternal();
+                        Writer.Write(dados, bytePointer, count);
+                    }
+
+                    bytePointer += count;
+                    bytesLeft -= count;
+                }
+
+                Thread.Sleep(10);
+
+                var ret = new ByteArrayBuilder();
+                var bufferSize = Math.Max(Config.ReadBufferSize, 1);
+                tentativas = 0;
+
+                while (Available > 0)
+                {
+                    try
+                    {
+                        var inbyte = new byte[bufferSize];
+                        var read = Reader.Read(inbyte, 0, bufferSize);
+                        if (read < 1) continue;
+
+                        var value = (byte)inbyte.GetValue(0);
+                        ret.Append(value);
+                    }
+                    catch (IOException ex)
+                    {
+                        this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
+                        tentativas++;
+                        if (tentativas >= Config.Tentativas) throw;
+
+                        Thread.Sleep(Config.IntervaloTentativas);
+
+                        CloseInternal();
+                        OpenInternal();
+                    }
+                }
+
+                return ret.ToArray();
+            }
+            finally
+            {
+                if (Config.ControlePorta) CloseInternal();
+            }
+        }
+
+        /// <summary>
         /// Le dados da porta de conexão
         /// </summary>
         /// <returns></returns>
@@ -230,75 +306,40 @@ namespace OpenAC.Net.Devices
             }
         }
 
-        /// <summary>
-        /// Função executa no dispose da classe.
-        /// </summary>
-        protected virtual void OnDisposing()
+        protected override void DisposeManaged()
         {
-        }
-
-        /// <summary>
-        /// Metodo responsavel pelo dispose da classe de comunicação.
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected void Dispose(bool disposing)
-        {
-            if (disposed) return;
-
-            if (disposing)
+            try
             {
-                try
-                {
-                    Reader?.Close();
-                }
-                catch (Exception e)
-                {
-                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing reader.", e);
-                }
-                try
-                {
-                    Reader?.Dispose();
-                }
-                catch (Exception e)
-                {
-                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing reader.", e);
-                }
-                try
-                {
-                    Writer?.Close();
-                }
-                catch (Exception e)
-                {
-                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing writer.", e);
-                }
-                try
-                {
-                    Writer?.Dispose();
-                }
-                catch (Exception e)
-                {
-                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing writer.", e);
-                }
-                try
-                {
-                    OnDisposing();
-                }
-                catch (Exception e)
-                {
-                    this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue during overridable dispose.", e);
-                }
+                Reader?.Close();
             }
-
-            disposed = true;
-        }
-
-        /// <summary>
-        /// Implementação da interface IDisposable
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
+            catch (Exception e)
+            {
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing reader.", e);
+            }
+            try
+            {
+                Reader?.Dispose();
+            }
+            catch (Exception e)
+            {
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing reader.", e);
+            }
+            try
+            {
+                Writer?.Close();
+            }
+            catch (Exception e)
+            {
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing writer.", e);
+            }
+            try
+            {
+                Writer?.Dispose();
+            }
+            catch (Exception e)
+            {
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing writer.", e);
+            }
         }
 
         #endregion Methods
