@@ -31,6 +31,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading;
 using OpenAC.Net.Core;
@@ -236,8 +237,7 @@ namespace OpenAC.Net.Devices
                         var read = Reader.Read(inbyte, 0, bufferSize);
                         if (read < 1) continue;
 
-                        var value = (byte)inbyte.GetValue(0);
-                        ret.Append(value);
+                        ret.Append(inbyte.Take(read));
                     }
                     catch (IOException ex)
                     {
@@ -282,8 +282,7 @@ namespace OpenAC.Net.Devices
                         var read = Reader.Read(inbyte, 0, bufferSize);
                         if (read < 1) continue;
 
-                        var value = (byte)inbyte.GetValue(0);
-                        ret.Append(value);
+                        ret.Append(inbyte.Take(read));
                     }
                     catch (IOException ex)
                     {
