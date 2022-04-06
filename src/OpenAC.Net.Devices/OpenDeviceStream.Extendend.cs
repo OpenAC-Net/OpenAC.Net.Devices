@@ -43,7 +43,10 @@ namespace OpenAC.Net.Devices
 
         #region Properties
 
-        public new TConfig Config { get; }
+        /// <summary>
+        /// Retorna as configurações do device.
+        /// </summary>
+        public new TConfig Config => (TConfig)base.Config;
 
         #endregion Properties
     }
