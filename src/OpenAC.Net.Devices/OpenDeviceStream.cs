@@ -228,7 +228,7 @@ namespace OpenAC.Net.Devices
                 var ret = new ByteArrayBuilder();
                 var bufferSize = Math.Max(Config.ReadBufferSize, 1);
                 tentativas = 0;
-
+                
                 while (Available > 0)
                 {
                     try
