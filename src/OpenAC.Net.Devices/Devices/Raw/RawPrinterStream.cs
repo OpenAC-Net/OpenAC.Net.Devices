@@ -131,6 +131,12 @@ namespace OpenAC.Net.Devices
 
         #endregion InnerTypes
 
+        #region Fields
+
+        private MemoryStream stream;
+
+        #endregion Fields
+
         #region Constructors
 
         /// <summary>
@@ -140,6 +146,7 @@ namespace OpenAC.Net.Devices
         public RawPrinterStream(string printerName)
         {
             PrinterName = printerName;
+            stream = new MemoryStream();
         }
 
         #endregion Constructors
@@ -164,7 +171,14 @@ namespace OpenAC.Net.Devices
 
         public override void Flush()
         {
-            //
+            var buffer = stream.ToArray();
+
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                Unix.SendToPrinter(PrinterName, buffer, 0, buffer.Length);
+            else
+                Windows.SendToPrinter(PrinterName, buffer, 0, buffer.Length);
+
+            stream.Clear();
         }
 
         public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
@@ -173,12 +187,15 @@ namespace OpenAC.Net.Devices
 
         public override int Read(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
-        public override void Write(byte[] buffer, int offset, int count)
+        public override void Write(byte[] buffer, int offset, int count) => stream.Write(buffer, offset, count);
+
+        protected override void Dispose(bool disposing)
         {
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                Unix.SendToPrinter(PrinterName, buffer, offset, count);
-            else
-                Windows.SendToPrinter(PrinterName, buffer, offset, count);
+            if (!disposing) return;
+
+            Flush();
+            stream.Dispose();
+            stream = null;
         }
 
         #endregion Methods

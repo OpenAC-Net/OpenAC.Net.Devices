@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31624.102
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices", "OpenAC.Net.Devices\OpenAC.Net.Devices.csproj", "{282970D1-6F4E-4B73-9296-C7A3C4A353B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Devices", "OpenAC.Net.Devices\OpenAC.Net.Devices.csproj", "{282970D1-6F4E-4B73-9296-C7A3C4A353B9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices.USB", "OpenAC.Net.Devices.USB\OpenAC.Net.Devices.USB.csproj", "{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices.Bluetooth", "OpenAC.Net.Devices.Bluetooth\OpenAC.Net.Devices.Bluetooth.csproj", "{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{282970D1-6F4E-4B73-9296-C7A3C4A353B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{282970D1-6F4E-4B73-9296-C7A3C4A353B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{282970D1-6F4E-4B73-9296-C7A3C4A353B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

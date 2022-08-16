@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenUSBHardwareType.cs" company="OpenAC .Net">
+// <copyright file="MemoryStreamExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 //	     		    Copyright (c) 2016 Projeto OpenAC .Net
 //
@@ -29,13 +29,20 @@
 // <summary></summary>
 // ***********************************************************************
 
+using System;
+using System.IO;
+
 namespace OpenAC.Net.Devices
 {
-    public enum OpenUSBHardwareType
+    internal static class MemoryStreamExtensions
     {
-        Unknown,
-        POSPrinter,
-        LabelPrinter,
-        Fiscal
+        public static void Clear(this MemoryStream ms)
+        {
+            var buffer = ms.GetBuffer();
+            Array.Clear(buffer, 0, buffer.Length);
+            ms.Position = 0;
+            ms.SetLength(0);
+            ms.Capacity = 0;
+        }
     }
 }

@@ -33,7 +33,7 @@ using System.ComponentModel;
 
 namespace OpenAC.Net.Devices
 {
-    public static class EventHandlerExtension
+    internal static class EventHandlerExtension
     {
         /// <summary>
         /// Chama o evento.

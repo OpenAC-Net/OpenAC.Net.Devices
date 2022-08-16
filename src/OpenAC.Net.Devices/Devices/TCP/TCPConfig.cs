@@ -29,21 +29,12 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Text;
-
 namespace OpenAC.Net.Devices
 {
     public sealed class TCPConfig : BaseConfig
     {
         #region Fields
 
-        private bool controlePorta = true;
-        private Encoding encoding = Encoding.UTF8;
-        private int timeOut;
-        private int tentativas;
-        private int intervaloTentativas;
-        private int readBufferSize;
-        private int writeBufferSize;
         private string ip;
         private int porta;
 

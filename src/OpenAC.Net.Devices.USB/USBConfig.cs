@@ -1,14 +1,14 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Devices
+// Assembly         : OpenAC.Net.Devices.USB
 // Author           : RFTD
-// Created          : 20-12-2018
+// Created          : 11-06-2022
 //
 // Last Modified By : RFTD
-// Last Modified On : 20-12-2018
+// Last Modified On : 11-06-2022
 // ***********************************************************************
-// <copyright file="OpenUSBID.cs" company="OpenAC .Net">
+// <copyright file="USBConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+// 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,39 +29,45 @@
 // <summary></summary>
 // ***********************************************************************
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices.USB
 {
-    public sealed class OpenUSBID
+    public sealed class USBConfig : BaseConfig
     {
+        #region Fields
+
+        private uint vendorId;
+        private uint productId;
+
+        #endregion Fields
+
+        #region Constructors
+
+        public USBConfig() : base("USB")
+        {
+        }
+
+        public USBConfig(uint vendor, uint product) : this()
+        {
+            vendorId = vendor;
+            productId = product;
+        }
+
+        #endregion Constructors
+
         #region Properties
 
-        public USBVendors Vendor { get; set; }
+        public uint VendorId
+        {
+            get => vendorId;
+            set => SetProperty(ref vendorId, value);
+        }
 
-        public string Produto { get; set; }
-
-        public string ProdutoId { get; set; }
-
-        public OpenUSBHardwareType Tipo { get; set; }
+        public uint ProductId
+        {
+            get => productId;
+            set => SetProperty(ref productId, value);
+        }
 
         #endregion Properties
-
-        #region Methods
-
-        /// <inheritdoc />
-        public override string ToString() => $"USB:{Vendor.Nome}, {Produto}";
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="usbid"></param>
-        /// <returns></returns>
-        public static implicit operator string(OpenUSBID usbid) => usbid.ToString();
-
-        #endregion Methods
-    }
-
-    public class USBVendors
-    {
-        public string Nome { get; set; }
     }
 }
