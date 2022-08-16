@@ -36,17 +36,10 @@ namespace OpenAC.Net.Devices
 {
     internal sealed class OpenRawStream : OpenDeviceStream<RawConfig>
     {
-        #region Fields
-
-        private readonly RawPrinterStream printer;
-
-        #endregion Fields
-
         #region Constructor
 
         public OpenRawStream(RawConfig config) : base(config)
         {
-            printer = new RawPrinterStream(config.Impressora);
         }
 
         #endregion Constructor
@@ -61,7 +54,7 @@ namespace OpenAC.Net.Devices
 
         protected override bool OpenInternal()
         {
-            Writer = new BinaryWriter(printer);
+            Writer = new BinaryWriter(new RawPrinterStream(Config.Impressora));
             return true;
         }
 
@@ -75,7 +68,7 @@ namespace OpenAC.Net.Devices
         protected override void DisposeManaged()
         {
             base.DisposeManaged();
-            printer?.Dispose();
+            Writer?.Dispose();
         }
 
         #endregion Methods
