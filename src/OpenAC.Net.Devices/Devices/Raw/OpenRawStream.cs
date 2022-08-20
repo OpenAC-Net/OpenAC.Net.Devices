@@ -65,12 +65,6 @@ namespace OpenAC.Net.Devices
             return true;
         }
 
-        protected override void DisposeManaged()
-        {
-            base.DisposeManaged();
-            Writer?.Dispose();
-        }
-
         #endregion Methods
     }
 }
