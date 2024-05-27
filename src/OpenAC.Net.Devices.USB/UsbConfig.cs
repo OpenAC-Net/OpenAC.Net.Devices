@@ -6,7 +6,7 @@
 // Last Modified By : RFTD
 // Last Modified On : 11-06-2022
 // ***********************************************************************
-// <copyright file="OpenUSBStream.cs" company="OpenAC .Net">
+// <copyright file="USBConfig.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
 // 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
 //
@@ -29,52 +29,45 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.IO;
-using HidSharp;
-using OpenAC.Net.Core;
-
 namespace OpenAC.Net.Devices.USB
 {
-    public sealed class OpenUsbStream : OpenDeviceStream<USBConfig>
+    public sealed class UsbConfig : BaseConfig
     {
+        #region Fields
+
+        private int vendorId;
+        private int productId;
+
+        #endregion Fields
+
         #region Constructors
 
-        public OpenUsbStream(USBConfig config) : base(config)
+        public UsbConfig() : base("USB")
         {
-            
+        }
+
+        public UsbConfig(int vendor, int product) : this()
+        {
+            vendorId = vendor;
+            productId = product;
         }
 
         #endregion Constructors
 
         #region Properties
 
-        protected override int Available => 0;
+        public int VendorId
+        {
+            get => vendorId;
+            set => SetProperty(ref vendorId, value);
+        }
+
+        public int ProductId
+        {
+            get => productId;
+            set => SetProperty(ref productId, value);
+        }
 
         #endregion Properties
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            var device = DeviceList.Local.GetHidDeviceOrNull(Config.VendorId, Config.ProductId);
-            if (device == null) throw new OpenException("Dispositivo não localizado");
-
-            if (!device.TryOpen(out var stream)) return false;
-            Writer = new BinaryWriter(stream);
-            Reader = new BinaryReader(stream);
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            Reader?.Dispose();
-            Writer?.Dispose();
-
-            Reader = null;
-            Writer = null;
-            return true;
-        }
-
-        #endregion Methods
     }
 }

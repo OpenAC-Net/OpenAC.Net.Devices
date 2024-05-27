@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenAC.Net.Devices", "OpenAC.Net.Devices\OpenAC.Net.Devices.csproj", "{282970D1-6F4E-4B73-9296-C7A3C4A353B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices.USB", "OpenAC.Net.Devices.USB\OpenAC.Net.Devices.USB.csproj", "{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices.Usb", "OpenAC.Net.Devices.Usb\OpenAC.Net.Devices.Usb.csproj", "{F1DF2155-D0F0-4FD1-A339-FE04B86F49F0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenAC.Net.Devices.Bluetooth", "OpenAC.Net.Devices.Bluetooth\OpenAC.Net.Devices.Bluetooth.csproj", "{AA76DBC4-C950-4AA9-BA7D-C16AB9B37414}"
 EndProject
