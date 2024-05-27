@@ -35,8 +35,8 @@ namespace OpenAC.Net.Devices.USB
     {
         #region Fields
 
-        private uint vendorId;
-        private uint productId;
+        private int vendorId;
+        private int productId;
 
         #endregion Fields
 
@@ -46,7 +46,7 @@ namespace OpenAC.Net.Devices.USB
         {
         }
 
-        public USBConfig(uint vendor, uint product) : this()
+        public USBConfig(int vendor, int product) : this()
         {
             vendorId = vendor;
             productId = product;
@@ -56,13 +56,13 @@ namespace OpenAC.Net.Devices.USB
 
         #region Properties
 
-        public uint VendorId
+        public int VendorId
         {
             get => vendorId;
             set => SetProperty(ref vendorId, value);
         }
 
-        public uint ProductId
+        public int ProductId
         {
             get => productId;
             set => SetProperty(ref productId, value);

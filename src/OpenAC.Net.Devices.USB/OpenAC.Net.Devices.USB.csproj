@@ -29,10 +29,15 @@
 		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<PackageId>OpenAC.Net.Devices.USB</PackageId>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\OpenAC.Net.Devices\OpenAC.Net.Devices.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HidSharp" Version="2.1.0" />
   </ItemGroup>
 
 </Project>
