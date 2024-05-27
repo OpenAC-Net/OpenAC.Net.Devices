@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="OpenDeviceStream.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2024 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -45,12 +45,6 @@ namespace OpenAC.Net.Devices
     /// </summary>
     public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     {
-        #region Fields
-
-        private bool disposed;
-
-        #endregion Fields
-
         #region Constructors
 
         /// <summary>
@@ -313,7 +307,7 @@ namespace OpenAC.Net.Devices
             }
             catch (Exception e)
             {
-                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing reader.", e);
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod()?.Name}]:[{GetType().Name}] Dispose Issue closing reader.", e);
             }
             try
             {
@@ -321,7 +315,7 @@ namespace OpenAC.Net.Devices
             }
             catch (Exception e)
             {
-                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing reader.", e);
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod()?.Name}]:[{GetType().Name}] Dispose Issue disposing reader.", e);
             }
             try
             {
@@ -329,7 +323,7 @@ namespace OpenAC.Net.Devices
             }
             catch (Exception e)
             {
-                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue closing writer.", e);
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod()?.Name}]:[{GetType().Name}] Dispose Issue closing writer.", e);
             }
             try
             {
@@ -337,7 +331,7 @@ namespace OpenAC.Net.Devices
             }
             catch (Exception e)
             {
-                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod().Name}]:[{this.GetType().Name}] Dispose Issue disposing writer.", e);
+                this.Log().Debug($"[{this}.{MethodBase.GetCurrentMethod()?.Name}]:[{GetType().Name}] Dispose Issue disposing writer.", e);
             }
         }
 

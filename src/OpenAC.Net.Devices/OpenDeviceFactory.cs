@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="OpenDeviceFactory.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2024 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -31,6 +31,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using OpenAC.Net.Core;
 
@@ -89,6 +90,7 @@ namespace OpenAC.Net.Devices
                           select c.Value).FirstOrDefault();
 
             Guard.Against<OpenException>(device == null, "Classe de comunicação não localizada.");
+            Debug.Assert(device != null, nameof(device) + " != null");
             return (OpenDeviceStream)Activator.CreateInstance(device, config);
         }
 

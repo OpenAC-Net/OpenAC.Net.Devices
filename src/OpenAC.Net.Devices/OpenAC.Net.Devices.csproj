@@ -7,7 +7,7 @@
     <RootNamespace>OpenAC.Net.Devices</RootNamespace>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>OpenAC.snk</AssemblyOriginatorKeyFile>
-    <Copyright>Copyright © Projeto OpenAC .Net 2014 - 2022</Copyright>
+    <Copyright>Copyright © Projeto OpenAC .Net 2014 - 2024</Copyright>
     <Company>OpenAC .Net - Automação Comercial em .Net</Company>
     <Authors>Projeto OpenAC .Net</Authors>
     <PackageProjectUrl>https://openac-net.github.io/</PackageProjectUrl>
@@ -19,9 +19,9 @@
     <Description>Biblioteca para comunicação com dispositivos usada pelo Projeto OpenAC .Net</Description>
     <NeutralLanguage>pt-BR</NeutralLanguage>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <AssemblyVersion>1.5.0.1</AssemblyVersion>
-    <FileVersion>1.5.0.1</FileVersion>
-    <Version>1.5.0.1</Version>
+    <AssemblyVersion>1.5.0.2</AssemblyVersion>
+    <FileVersion>1.5.0.2</FileVersion>
+    <Version>1.5.0.2</Version>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <DebugType>embedded</DebugType>

@@ -8,7 +8,7 @@
 // ***********************************************************************
 // <copyright file="RawPrinterStream.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-//	     		    Copyright (c) 2016 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2024 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 // ***********************************************************************
 
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -39,7 +40,7 @@ namespace OpenAC.Net.Devices
     {
         #region InnerTypes
 
-        public sealed class Windows
+        private static class Windows
         {
             #region InnerTypes
 
@@ -81,15 +82,15 @@ namespace OpenAC.Net.Devices
 
             #region Methods
 
-            public static bool SendToPrinter(string printerName, byte[] buffer, int offset, int count)
+            public static void SendToPrinter(string printerName, byte[] buffer)
             {
                 // Open the printer.
-                if (!OpenPrinter(printerName.Normalize(), out var hPrinter, IntPtr.Zero)) return false;
+                if (!OpenPrinter(printerName.Normalize(), out var hPrinter, IntPtr.Zero)) return;
 
-                var bSuccess = false;
                 var di = new DOCINFOA
                 {
                     pDocName = "RAW Document",
+                    pOutputFile = null,
                     pDataType = "RAW"
                 };
 
@@ -99,12 +100,12 @@ namespace OpenAC.Net.Devices
                     // Start a page.
                     if (StartPagePrinter(hPrinter))
                     {
-                        var pUnmanagedBytes = Marshal.AllocCoTaskMem(count);
+                        var pUnmanagedBytes = Marshal.AllocCoTaskMem(buffer.Length);
 
                         try
                         {
-                            Marshal.Copy(buffer, offset, pUnmanagedBytes, count);
-                            bSuccess = WritePrinter(hPrinter, pUnmanagedBytes, count, out _);
+                            Marshal.Copy(buffer, 0, pUnmanagedBytes, buffer.Length);
+                            WritePrinter(hPrinter, pUnmanagedBytes, buffer.Length, out _);
                             EndPagePrinter(hPrinter);
                         }
                         finally
@@ -117,16 +118,29 @@ namespace OpenAC.Net.Devices
                 }
 
                 ClosePrinter(hPrinter);
-
-                return bSuccess;
             }
 
             #endregion Methods
         }
 
-        public sealed class Unix
+        private static class Unix
         {
-            public static bool SendToPrinter(string printerName, byte[] buffer, int offset, int count) => throw new NotImplementedException("Plataforma não suportada.");
+            public static void SendToPrinter(string printerName, byte[] buffer)
+            {
+                var file = Path.GetTempFileName();
+                File.WriteAllBytes(file, buffer);
+
+                var startInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = "lp",
+                    Arguments = $"-d \"{printerName}\" {file}"
+                };
+
+                var process = Process.Start(startInfo);
+                process?.WaitForExit();
+                File.Delete(file);
+            }
         }
 
         #endregion InnerTypes
@@ -155,15 +169,19 @@ namespace OpenAC.Net.Devices
 
         public string PrinterName { get; }
 
-        public override bool CanRead { get; } = false;
+        public override bool CanRead => false;
 
-        public override bool CanSeek { get; } = false;
+        public override bool CanSeek => false;
 
-        public override bool CanWrite { get; } = true;
+        public override bool CanWrite => true;
 
-        public override long Length { get; }
+        public override long Length => stream.Length;
 
-        public override long Position { get; set; }
+        public override long Position
+        {
+            get => stream.Position;
+            set => stream.Position = value;
+        }
 
         #endregion Properties
 
@@ -171,14 +189,21 @@ namespace OpenAC.Net.Devices
 
         public override void Flush()
         {
-            var buffer = stream.ToArray();
+            try
+            {
+                var buffer = stream.ToArray();
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
-                Unix.SendToPrinter(PrinterName, buffer, 0, buffer.Length);
-            else
-                Windows.SendToPrinter(PrinterName, buffer, 0, buffer.Length);
+                if (Environment.OSVersion.Platform == PlatformID.Unix)
+                    Unix.SendToPrinter(PrinterName, buffer);
+                else
+                    Windows.SendToPrinter(PrinterName, buffer);
 
-            stream.Clear();
+                stream.Clear();
+            }
+            catch (Exception e)
+            {
+                throw new IOException("Erro ao enviar dados a Impressora", e);
+            }
         }
 
         public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
