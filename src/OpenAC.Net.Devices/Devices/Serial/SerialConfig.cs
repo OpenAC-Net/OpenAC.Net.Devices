@@ -30,6 +30,7 @@
 // ***********************************************************************
 
 using System;
+using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using OpenAC.Net.Core.Extensions;
@@ -46,7 +47,8 @@ namespace OpenAC.Net.Devices
         private Parity parity;
         private StopBits stopBits;
         private Handshake handshake;
-        private readonly string[] validPorts = { "COM", "LPT" };
+        private readonly string[] windowsPorts;
+        private readonly string[] unixesPorts;
 
         #endregion Fields
 
@@ -54,6 +56,13 @@ namespace OpenAC.Net.Devices
 
         public SerialConfig() : base("Serial")
         {
+            windowsPorts = new[] { "COM", "LPT" };
+            unixesPorts = Directory.GetFiles("/dev/", "tty*")   // Linux / FreeBSD / macOS
+                .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
+                .Concat(Directory.GetFiles("/dev/", "cu*"))     // FreeBSD / macOS
+                .Distinct()
+                .ToArray();
+
             Porta = "COM1";
             Baud = 9600;
             DataBits = 8;
@@ -117,7 +126,7 @@ namespace OpenAC.Net.Devices
         #region Methods
 
         /// <inheritdoc />
-        private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && validPorts.Any(p => aPorta.ToUpper().StartsWith(p));
+        private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && (windowsPorts.Any(p => aPorta.ToUpper().StartsWith(p)) || unixesPorts.Contains(aPorta));
 
         #endregion Methods
     }
