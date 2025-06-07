@@ -29,25 +29,33 @@
 // <summary></summary>
 // ***********************************************************************
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+/// <summary>
+/// Classe abstrata para comunicação com dispositivos utilizando configurações genéricas.
+/// </summary>
+/// <typeparam name="TConfig">O tipo de configuração do dispositivo.</typeparam>
+public abstract class OpenDeviceStream<TConfig> : OpenDeviceStream where TConfig : IDeviceConfig
 {
-    public abstract class OpenDeviceStream<TConfig> : OpenDeviceStream where TConfig : IDeviceConfig
+    #region Constructors
+
+    
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="OpenDeviceStream{TConfig}"/>.
+    /// </summary>
+    /// <param name="config">As configurações específicas do dispositivo.</param>
+    protected OpenDeviceStream(TConfig config) : base(config)
     {
-        #region Constructors
-
-        protected OpenDeviceStream(TConfig config) : base(config)
-        {
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        /// <summary>
-        /// Retorna as configurações do device.
-        /// </summary>
-        public new TConfig Config => (TConfig)base.Config;
-
-        #endregion Properties
     }
+
+    #endregion Constructors
+
+    #region Properties
+
+    /// <summary>
+    /// Obtém as configurações específicas do dispositivo.
+    /// </summary>
+    public new TConfig Config => (TConfig)base.Config;
+
+    #endregion Properties
 }

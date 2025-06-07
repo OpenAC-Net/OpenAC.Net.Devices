@@ -1,14 +1,14 @@
 ﻿// ***********************************************************************
-// Assembly         : OpenAC.Net.Devices.USB
+// Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
-// Created          : 11-06-2022
+// Created          : 20-12-2018
 //
 // Last Modified By : RFTD
-// Last Modified On : 11-06-2022
+// Last Modified On : 20-12-2018
 // ***********************************************************************
-// <copyright file="OpenUSBStream.cs" company="OpenAC .Net">
+// <copyright file="MemoryStreamExtensions.cs" company="OpenAC .Net">
 //		        		   The MIT License (MIT)
-// 		    Copyright (c) 2016 - 2022 Projeto OpenAC .Net
+//	     		    Copyright (c) 2014 - 2024 Projeto OpenAC .Net
 //
 //	 Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the "Software"),
@@ -29,52 +29,25 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.IO;
-using HidSharp;
-using OpenAC.Net.Core;
+using SpawnDev.BlazorJS.JSObjects;
+using Array = System.Array;
 
-namespace OpenAC.Net.Devices.USB
+namespace OpenAC.Net.Devices.Blazor.Extensions;
+
+internal static class MemoryStreamExtensions
 {
-    public sealed class OpenUsbStream : OpenDeviceStream<UsbConfig>
+    public static ArrayBuffer ToArrayBuffer(this MemoryStream ms)
     {
-        #region Constructors
-
-        public OpenUsbStream(UsbConfig config) : base(config)
-        {
-            
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        protected override int Available => 0;
-
-        #endregion Properties
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            var device = DeviceList.Local.GetHidDeviceOrNull(Config.VendorId, Config.ProductId);
-            if (device == null) throw new OpenException("Dispositivo não localizado");
-
-            if (!device.TryOpen(out var stream)) return false;
-            Writer = new BinaryWriter(stream);
-            Reader = new BinaryReader(stream);
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            Reader?.Dispose();
-            Writer?.Dispose();
-
-            Reader = null;
-            Writer = null;
-            return true;
-        }
-
-        #endregion Methods
+        using var uint8Array = new Uint8Array(ms.ToArray());
+        return uint8Array.Buffer;
+    }
+    
+    public static void Clear(this MemoryStream ms)
+    {
+        var buffer = ms.GetBuffer();
+        Array.Clear(buffer, 0, buffer.Length);
+        ms.Position = 0;
+        ms.SetLength(0);
+        ms.Capacity = 0;
     }
 }

@@ -29,45 +29,44 @@
 // <summary></summary>
 // ***********************************************************************
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+public sealed class TCPConfig : BaseConfig
 {
-    public sealed class TCPConfig : BaseConfig
+    #region Fields
+
+    private string ip;
+    private int porta;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public TCPConfig() : base("TCP")
     {
-        #region Fields
-
-        private string ip;
-        private int porta;
-
-        #endregion Fields
-
-        #region Constructors
-
-        public TCPConfig() : base("TCP")
-        {
-        }
-
-        public TCPConfig(string ip, int porta) : this()
-        {
-            this.ip = ip;
-            this.porta = porta;
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public string IP
-        {
-            get => ip;
-            set => SetProperty(ref ip, value);
-        }
-
-        public int Porta
-        {
-            get => porta;
-            set => SetProperty(ref porta, value);
-        }
-
-        #endregion Properties
     }
+
+    public TCPConfig(string ip, int porta) : this()
+    {
+        this.ip = ip;
+        this.porta = porta;
+    }
+
+    #endregion Constructors
+
+    #region Properties
+
+    public string IP
+    {
+        get => ip;
+        set => SetProperty(ref ip, value);
+    }
+
+    public int Porta
+    {
+        get => porta;
+        set => SetProperty(ref porta, value);
+    }
+
+    #endregion Properties
 }

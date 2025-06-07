@@ -31,50 +31,49 @@
 
 using System.ComponentModel;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+internal static class EventHandlerExtension
 {
-    internal static class EventHandlerExtension
+    /// <summary>
+    /// Chama o evento.
+    /// </summary>
+    /// <param name="eventHandler">The event handler.</param>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The e.</param>
+    public static void Raise(this PropertyChangingEventHandler eventHandler, object sender, PropertyChangingEventArgs e)
     {
-        /// <summary>
-        /// Chama o evento.
-        /// </summary>
-        /// <param name="eventHandler">The event handler.</param>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The e.</param>
-        public static void Raise(this PropertyChangingEventHandler eventHandler, object sender, PropertyChangingEventArgs e)
-        {
-            if (eventHandler == null)
-                return;
+        if (eventHandler == null)
+            return;
 
-            if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
-            {
-                synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
-            }
-            else
-            {
-                eventHandler.DynamicInvoke(sender, e);
-            }
+        if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
+        {
+            synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
         }
-
-        /// <summary>
-        /// Chama o evento.
-        /// </summary>
-        /// <param name="eventHandler">The event handler.</param>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The e.</param>
-        public static void Raise(this PropertyChangedEventHandler eventHandler, object sender, PropertyChangedEventArgs e)
+        else
         {
-            if (eventHandler == null)
-                return;
+            eventHandler.DynamicInvoke(sender, e);
+        }
+    }
 
-            if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
-            {
-                synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
-            }
-            else
-            {
-                eventHandler.DynamicInvoke(sender, e);
-            }
+    /// <summary>
+    /// Chama o evento.
+    /// </summary>
+    /// <param name="eventHandler">The event handler.</param>
+    /// <param name="sender">The sender.</param>
+    /// <param name="e">The e.</param>
+    public static void Raise(this PropertyChangedEventHandler eventHandler, object sender, PropertyChangedEventArgs e)
+    {
+        if (eventHandler == null)
+            return;
+
+        if (eventHandler.Target is ISynchronizeInvoke { InvokeRequired: true } synchronizeInvoke)
+        {
+            synchronizeInvoke.Invoke(eventHandler, new[] { sender, e });
+        }
+        else
+        {
+            eventHandler.DynamicInvoke(sender, e);
         }
     }
 }

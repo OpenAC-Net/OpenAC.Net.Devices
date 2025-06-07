@@ -33,91 +33,90 @@ using System.IO;
 using System.IO.Ports;
 using System.Threading.Tasks;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+internal sealed class OpenSerialStream : OpenDeviceStream<SerialConfig>
 {
-    internal sealed class OpenSerialStream : OpenDeviceStream<SerialConfig>
+    #region Fields
+
+    private readonly SerialPort serialPort;
+
+    #endregion Fields
+
+    #region Constructor
+
+    public OpenSerialStream(SerialConfig config) : base(config)
     {
-        #region Fields
-
-        private readonly SerialPort serialPort;
-
-        #endregion Fields
-
-        #region Constructor
-
-        public OpenSerialStream(SerialConfig config) : base(config)
-        {
-            serialPort = new SerialPort();
-        }
-
-        #endregion Constructor
-
-        #region Properties
-
-        protected override int Available => serialPort?.BytesToRead ?? 0;
-
-        #endregion Properties
-
-        #region Methods
-
-        public override void Limpar()
-        {
-            if (serialPort.IsOpen) serialPort.DiscardInBuffer();
-        }
-
-        protected override bool OpenInternal()
-        {
-            if (serialPort.IsOpen) return false;
-
-            ConfigSerial();
-            serialPort.Open();
-
-            Reader = new BinaryReader(serialPort.BaseStream);
-            Writer = new BinaryWriter(serialPort.BaseStream);
-
-            return serialPort.IsOpen;
-        }
-
-        protected override bool CloseInternal()
-        {
-            if (!serialPort.IsOpen) return false;
-
-            serialPort.Close();
-            Reader?.Dispose();
-            Writer?.Dispose();
-
-            Reader = null;
-            Writer = null;
-
-            return !serialPort.IsOpen;
-        }
-
-        private void ConfigSerial()
-        {
-            serialPort.PortName = Config.Porta;
-            serialPort.BaudRate = Config.Baud;
-            serialPort.DataBits = Config.DataBits;
-            serialPort.Parity = Config.Parity;
-            serialPort.StopBits = Config.StopBits;
-            serialPort.Handshake = Config.Handshake;
-            serialPort.ReadTimeout = Config.TimeOut;
-            serialPort.WriteTimeout = Config.TimeOut;
-            serialPort.ReadBufferSize = Config.ReadBufferSize;
-            serialPort.WriteBufferSize = Config.WriteBufferSize;
-        }
-
-        #endregion Methods
-
-        #region Dispose Methods
-
-        protected override void DisposeManaged()
-        {
-            base.DisposeManaged();
-            serialPort?.Close();
-            serialPort?.Dispose();
-            Task.Delay(250).Wait();
-        }
-
-        #endregion Dispose Methods
+        serialPort = new SerialPort();
     }
+
+    #endregion Constructor
+
+    #region Properties
+
+    protected override int Available => serialPort?.BytesToRead ?? 0;
+
+    #endregion Properties
+
+    #region Methods
+
+    public override void Limpar()
+    {
+        if (serialPort.IsOpen) serialPort.DiscardInBuffer();
+    }
+
+    protected override bool OpenInternal()
+    {
+        if (serialPort.IsOpen) return false;
+
+        ConfigSerial();
+        serialPort.Open();
+
+        Reader = new BinaryReader(serialPort.BaseStream);
+        Writer = new BinaryWriter(serialPort.BaseStream);
+
+        return serialPort.IsOpen;
+    }
+
+    protected override bool CloseInternal()
+    {
+        if (!serialPort.IsOpen) return false;
+
+        serialPort.Close();
+        Reader?.Dispose();
+        Writer?.Dispose();
+
+        Reader = null;
+        Writer = null;
+
+        return !serialPort.IsOpen;
+    }
+
+    private void ConfigSerial()
+    {
+        serialPort.PortName = Config.Porta;
+        serialPort.BaudRate = Config.Baud;
+        serialPort.DataBits = Config.DataBits;
+        serialPort.Parity = Config.Parity;
+        serialPort.StopBits = Config.StopBits;
+        serialPort.Handshake = Config.Handshake;
+        serialPort.ReadTimeout = Config.TimeOut;
+        serialPort.WriteTimeout = Config.TimeOut;
+        serialPort.ReadBufferSize = Config.ReadBufferSize;
+        serialPort.WriteBufferSize = Config.WriteBufferSize;
+    }
+
+    #endregion Methods
+
+    #region Dispose Methods
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        serialPort?.Close();
+        serialPort?.Dispose();
+        Task.Delay(250).Wait();
+    }
+
+    #endregion Dispose Methods
 }

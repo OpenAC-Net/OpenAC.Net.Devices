@@ -34,66 +34,65 @@ using System.IO;
 using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
 {
-    internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
+    #region Fields
+
+    private FileStream client;
+
+    #endregion Fields
+
+    #region Constructor
+
+    public OpenFileStream(FileConfig config) : base(config)
     {
-        #region Fields
-
-        private FileStream client;
-
-        #endregion Fields
-
-        #region Constructor
-
-        public OpenFileStream(FileConfig config) : base(config)
-        {
-            Guard.Against<ArgumentException>(config.File.IsEmpty(), "Arquivo não informado.");
-        }
-
-        #endregion Constructor
-
-        #region Properties
-
-        protected override int Available => 0;
-
-        #endregion Properties
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            if (client != null) return false;
-
-            client = File.Open(Config.File, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
-            Writer = new BinaryWriter(client);
-
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            if (client == null) return false;
-
-            client?.Dispose();
-            Writer?.Dispose();
-
-            Writer = null;
-            client = null;
-
-            return true;
-        }
-
-        #endregion Methods
-
-        #region Dispose Methods
-
-        protected override void DisposeManaged()
-        {
-            base.DisposeManaged();
-            client?.Dispose();
-        }
-
-        #endregion Dispose Methods
+        Guard.Against<ArgumentException>(config.File.IsEmpty(), "Arquivo não informado.");
     }
+
+    #endregion Constructor
+
+    #region Properties
+
+    protected override int Available => 0;
+
+    #endregion Properties
+
+    #region Methods
+
+    protected override bool OpenInternal()
+    {
+        if (client != null) return false;
+
+        client = File.Open(Config.File, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
+        Writer = new BinaryWriter(client);
+
+        return true;
+    }
+
+    protected override bool CloseInternal()
+    {
+        if (client == null) return false;
+
+        client?.Dispose();
+        Writer?.Dispose();
+
+        Writer = null;
+        client = null;
+
+        return true;
+    }
+
+    #endregion Methods
+
+    #region Dispose Methods
+
+    protected override void DisposeManaged()
+    {
+        base.DisposeManaged();
+        client?.Dispose();
+    }
+
+    #endregion Dispose Methods
 }

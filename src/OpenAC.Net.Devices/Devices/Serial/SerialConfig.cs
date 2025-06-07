@@ -35,99 +35,124 @@ using System.IO.Ports;
 using System.Linq;
 using OpenAC.Net.Core.Extensions;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+/// <summary>
+/// Representa a configuração de uma conexão serial.
+/// </summary>
+public class SerialConfig : BaseConfig
 {
-    public class SerialConfig : BaseConfig
+    #region Fields
+
+    private string porta;
+    private int baud;
+    private int dataBits;
+    private Parity parity;
+    private StopBits stopBits;
+    private Handshake handshake;
+    private readonly string[] windowsPorts;
+    private readonly string[] unixesPorts;
+
+    #endregion Fields
+
+    #region Constructor
+
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="SerialConfig"/>.
+    /// Define valores padrão para as propriedades da configuração serial.
+    /// </summary>
+    public SerialConfig() : base("Serial")
     {
-        #region Fields
+        windowsPorts = ["COM", "LPT"];
+        unixesPorts = Directory.GetFiles("/dev/", "tty*")   // Linux / FreeBSD / macOS
+            .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
+            .Concat(Directory.GetFiles("/dev/", "cu*"))     // FreeBSD / macOS
+            .Distinct()
+            .ToArray();
 
-        private string porta;
-        private int baud;
-        private int dataBits;
-        private Parity parity;
-        private StopBits stopBits;
-        private Handshake handshake;
-        private readonly string[] windowsPorts;
-        private readonly string[] unixesPorts;
-
-        #endregion Fields
-
-        #region Constructor
-
-        public SerialConfig() : base("Serial")
-        {
-            windowsPorts = new[] { "COM", "LPT" };
-            unixesPorts = Directory.GetFiles("/dev/", "tty*")   // Linux / FreeBSD / macOS
-                .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
-                .Concat(Directory.GetFiles("/dev/", "cu*"))     // FreeBSD / macOS
-                .Distinct()
-                .ToArray();
-
-            Porta = "COM1";
-            Baud = 9600;
-            DataBits = 8;
-            Parity = Parity.None;
-            StopBits = StopBits.One;
-            WriteBufferSize = 2048;
-            ReadBufferSize = 4096;
-            Handshake = Handshake.None;
-        }
-
-        #endregion Constructor
-
-        #region Properties
-
-        /// <summary>
-        /// Retorna/define o nome da porta serial para a conexão.
-        /// </summary>
-        /// <exception cref="ArgumentException"></exception>
-        public string Porta
-        {
-            get => porta;
-            set
-            {
-                if (!IsValidPort(value)) throw new ArgumentException("Porta ínvalida.");
-                if (!SetProperty(ref porta, value)) return;
-            }
-        }
-
-        public int Baud
-        {
-            get => baud;
-            set => SetProperty(ref baud, value);
-        }
-
-        public int DataBits
-        {
-            get => dataBits;
-            set => SetProperty(ref dataBits, value);
-        }
-
-        public Parity Parity
-        {
-            get => parity;
-            set => SetProperty(ref parity, value);
-        }
-
-        public StopBits StopBits
-        {
-            get => stopBits;
-            set => SetProperty(ref stopBits, value);
-        }
-
-        public Handshake Handshake
-        {
-            get => handshake;
-            set => SetProperty(ref handshake, value);
-        }
-
-        #endregion Properties
-
-        #region Methods
-
-        /// <inheritdoc />
-        private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && (windowsPorts.Any(p => aPorta.ToUpper().StartsWith(p)) || unixesPorts.Contains(aPorta));
-
-        #endregion Methods
+        Porta = "COM1";
+        Baud = 9600;
+        DataBits = 8;
+        Parity = Parity.None;
+        StopBits = StopBits.One;
+        WriteBufferSize = 2048;
+        ReadBufferSize = 4096;
+        Handshake = Handshake.None;
     }
+
+    #endregion Constructor
+
+    #region Properties
+
+    /// <summary>
+    /// Obtém ou define o nome da porta serial para a conexão.
+    /// </summary>
+    /// <exception cref="ArgumentException">Lançada quando o nome da porta é inválido.</exception>
+    public string Porta
+    {
+        get => porta;
+        set
+        {
+            if (!IsValidPort(value)) throw new ArgumentException("Porta ínvalida.");
+            if (!SetProperty(ref porta, value)) return;
+        }
+    }
+
+    /// <summary>
+    /// Obtém ou define a taxa de transmissão (baud rate) da conexão serial.
+    /// </summary>
+    public int Baud
+    {
+        get => baud;
+        set => SetProperty(ref baud, value);
+    }
+
+    /// <summary>
+    /// Obtém ou define o número de bits de dados na conexão serial.
+    /// </summary>
+    public int DataBits
+    {
+        get => dataBits;
+        set => SetProperty(ref dataBits, value);
+    }
+
+    /// <summary>
+    /// Obtém ou define o tipo de paridade usado na conexão serial.
+    /// </summary>
+    public Parity Parity
+    {
+        get => parity;
+        set => SetProperty(ref parity, value);
+    }
+
+    /// <summary>
+    /// Obtém ou define o número de bits de parada usados na conexão serial.
+    /// </summary>
+    public StopBits StopBits
+    {
+        get => stopBits;
+        set => SetProperty(ref stopBits, value);
+    }
+
+    /// <summary>
+    /// Obtém ou define o tipo de handshake usado na conexão serial.
+    /// </summary>
+    public Handshake Handshake
+    {
+        get => handshake;
+        set => SetProperty(ref handshake, value);
+    }
+
+    #endregion Properties
+
+    #region Methods
+    
+    /// <summary>
+    /// Verifica se o nome da porta fornecido é válido.
+    /// </summary>
+    /// <param name="aPorta">Nome da porta a ser validada.</param>
+    /// <returns>Retorna <c>true</c> se a porta for válida; caso contrário, <c>false</c>.</returns>
+    private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && (windowsPorts.Any(p => aPorta.ToUpper().StartsWith(p)) || unixesPorts.Contains(aPorta));
+
+    #endregion Methods
 }

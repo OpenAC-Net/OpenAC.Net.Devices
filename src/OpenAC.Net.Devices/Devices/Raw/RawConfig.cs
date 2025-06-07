@@ -31,37 +31,36 @@
 
 using System.Text;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+public sealed class RawConfig : BaseConfig
 {
-    public sealed class RawConfig : BaseConfig
+    #region Fields
+
+    private string impressora;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public RawConfig() : base("RAW")
     {
-        #region Fields
-
-        private string impressora;
-
-        #endregion Fields
-
-        #region Constructors
-
-        public RawConfig() : base("RAW")
-        {
-        }
-
-        public RawConfig(string impressora) : this()
-        {
-            this.impressora = impressora;
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public string Impressora
-        {
-            get => impressora;
-            set => SetProperty(ref impressora, value);
-        }
-
-        #endregion Properties
     }
+
+    public RawConfig(string impressora) : this()
+    {
+        this.impressora = impressora;
+    }
+
+    #endregion Constructors
+
+    #region Properties
+
+    public string Impressora
+    {
+        get => impressora;
+        set => SetProperty(ref impressora, value);
+    }
+
+    #endregion Properties
 }

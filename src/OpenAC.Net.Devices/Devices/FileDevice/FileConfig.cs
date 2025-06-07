@@ -31,44 +31,43 @@
 
 using System.Text;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+public sealed class FileConfig : BaseConfig
 {
-    public sealed class FileConfig : BaseConfig
+    #region Fields
+
+    private string file;
+    private bool createIfNotExits;
+
+    #endregion Fields
+
+    #region Constructors
+
+    public FileConfig() : base("File")
     {
-        #region Fields
-
-        private string file;
-        private bool createIfNotExits;
-
-        #endregion Fields
-
-        #region Constructors
-
-        public FileConfig() : base("File")
-        {
-        }
-
-        public FileConfig(string file) : this()
-        {
-            this.file = file;
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        public string File
-        {
-            get => file;
-            set => SetProperty(ref file, value);
-        }
-
-        public bool CreateIfNotExits
-        {
-            get => createIfNotExits;
-            set => SetProperty(ref createIfNotExits, value);
-        }
-
-        #endregion Properties
     }
+
+    public FileConfig(string file) : this()
+    {
+        this.file = file;
+    }
+
+    #endregion Constructors
+
+    #region Properties
+
+    public string File
+    {
+        get => file;
+        set => SetProperty(ref file, value);
+    }
+
+    public bool CreateIfNotExits
+    {
+        get => createIfNotExits;
+        set => SetProperty(ref createIfNotExits, value);
+    }
+
+    #endregion Properties
 }

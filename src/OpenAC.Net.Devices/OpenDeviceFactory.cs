@@ -35,65 +35,69 @@ using System.Diagnostics;
 using System.Linq;
 using OpenAC.Net.Core;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+/// <summary>
+/// Classe para gerenciar os tipos de comunicação.
+/// </summary>
+public static class OpenDeviceFactory
 {
+    #region Fields
+
+    private static readonly Dictionary<Type, Type> Communications;
+
+    #endregion Fields
+
+    #region Constructors
+
     /// <summary>
-    /// Classe para gerenciar os tipos de comunicação.
+    /// Construtor estático da classe <see cref="OpenDeviceFactory"/>.
+    /// Inicializa o dicionário de mapeamento entre tipos de configuração e tipos de dispositivos de comunicação.
     /// </summary>
-    public static class OpenDeviceFactory
+    static OpenDeviceFactory()
     {
-        #region Fields
-
-        private static readonly Dictionary<Type, Type> Communications;
-
-        #endregion Fields
-
-        #region Constructors
-
-        static OpenDeviceFactory()
+        Communications = new Dictionary<Type, Type>
         {
-            Communications = new Dictionary<Type, Type>
-            {
-                {typeof(SerialConfig), typeof(OpenSerialStream)},
-                {typeof(TCPConfig), typeof(OpenTcpStream)},
-                {typeof(RawConfig), typeof(OpenRawStream)},
-                {typeof(FileConfig), typeof(OpenFileStream)}
-            };
-        }
-
-        #endregion Constructors
-
-        #region Methods
-
-        /// <summary>
-        /// Registrar uma nova classe de comunicação
-        /// </summary>
-        /// <typeparam name="TConfig">Classe de configuração da classe device sendo registrada.</typeparam>
-        /// <typeparam name="TDevice">Classe de comunicação a ser registrada</typeparam>
-        public static void Register<TConfig, TDevice>()
-            where TConfig : IDeviceConfig
-            where TDevice : OpenDeviceStream
-        {
-            Communications.Add(typeof(TConfig), typeof(TDevice));
-        }
-
-        /// <summary>
-        /// Retorna a classe para comunicação de acordo com a configuração informada.
-        /// </summary>
-        /// <param name="config"></param>
-        /// <returns></returns>
-        public static OpenDeviceStream Create(IDeviceConfig config)
-        {
-            var configType = config.GetType();
-            var device = (from c in Communications
-                          where c.Key == configType || configType.IsAssignableFrom(c.Key)
-                          select c.Value).FirstOrDefault();
-
-            Guard.Against<OpenException>(device == null, "Classe de comunicação não localizada.");
-            Debug.Assert(device != null, nameof(device) + " != null");
-            return (OpenDeviceStream)Activator.CreateInstance(device, config);
-        }
-
-        #endregion Methods
+            {typeof(SerialConfig), typeof(OpenSerialStream)},
+            {typeof(TCPConfig), typeof(OpenTcpStream)},
+            {typeof(RawConfig), typeof(OpenRawStream)},
+            {typeof(FileConfig), typeof(OpenFileStream)}
+        };
     }
+
+    #endregion Constructors
+
+    #region Methods
+
+    /// <summary>
+    /// Registrar uma nova classe de comunicação
+    /// </summary>
+    /// <typeparam name="TConfig">Classe de configuração da classe device sendo registrada.</typeparam>
+    /// <typeparam name="TDevice">Classe de comunicação a ser registrada</typeparam>
+    public static void Register<TConfig, TDevice>()
+        where TConfig : IDeviceConfig
+        where TDevice : OpenDeviceStream
+    {
+        Communications.Add(typeof(TConfig), typeof(TDevice));
+    }
+
+    /// <summary>
+    /// Cria e retorna uma instância da classe de comunicação apropriada com base na configuração informada.
+    /// </summary>
+    /// <param name="config">Instância de configuração que define o tipo de comunicação desejado.</param>
+    /// <returns>Uma instância de <see cref="OpenDeviceStream"/> correspondente à configuração fornecida.</returns>
+    /// <exception cref="OpenException">Lançada caso não seja encontrada uma classe de comunicação compatível com a configuração.</exception>
+    public static OpenDeviceStream Create(IDeviceConfig config)
+    {
+        var configType = config.GetType();
+        var device = (from c in Communications
+            where c.Key == configType || configType.IsAssignableFrom(c.Key)
+            select c.Value).FirstOrDefault();
+
+        Guard.Against<OpenException>(device == null, "Classe de comunicação não localizada.");
+        Debug.Assert(device != null, nameof(device) + " != null");
+        return (OpenDeviceStream)Activator.CreateInstance(device, config);
+    }
+
+    #endregion Methods
 }

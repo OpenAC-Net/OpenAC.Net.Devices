@@ -31,48 +31,47 @@
 
 using System.Text;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+/// <summary>
+/// Interface para implementação das configurações da classe de comunicação.
+/// </summary>
+public interface IDeviceConfig
 {
     /// <summary>
-    /// Interface para implementação das configurações da classe de comunicação.
+    /// Retorna o nome do dispositivo desta configuração.
     /// </summary>
-    public interface IDeviceConfig
-    {
-        /// <summary>
-        /// Retorna o nome do dispositivo desta configuração.
-        /// </summary>
-        string Name { get; }
+    string Name { get; }
 
-        /// <summary>
-        /// Retorna/define se o controle da porta será feito de forma automatica.
-        /// </summary>
-        bool ControlePorta { get; set; }
+    /// <summary>
+    /// Retorna/define se o controle da porta será feito de forma automatica.
+    /// </summary>
+    bool ControlePorta { get; set; }
 
-        /// <summary>
-        /// Retorna/define o timeout da conexão.
-        /// </summary>
-        int TimeOut { get; set; }
+    /// <summary>
+    /// Retorna/define o timeout da conexão.
+    /// </summary>
+    int TimeOut { get; set; }
 
-        /// <summary>
-        /// Retorna/define o número de tentativas de conexão.
-        /// </summary>
-        int Tentativas { get; set; }
+    /// <summary>
+    /// Retorna/define o número de tentativas de conexão.
+    /// </summary>
+    int Tentativas { get; set; }
 
-        /// <summary>
-        /// Retorna/define o intervalo entre as tentativas de conexão.
-        /// </summary>
-        int IntervaloTentativas { get; set; }
+    /// <summary>
+    /// Retorna/define o intervalo entre as tentativas de conexão.
+    /// </summary>
+    int IntervaloTentativas { get; set; }
 
-        /// <summary>
-        /// Retorna/define o tamanho do buffer de leitura.
-        /// </summary>
+    /// <summary>
+    /// Retorna/define o tamanho do buffer de leitura.
+    /// </summary>
 
-        int ReadBufferSize { get; set; }
+    int ReadBufferSize { get; set; }
 
-        /// <summary>
-        /// Retorna/define o tamanho do buffer de escrita.
-        /// </summary>
+    /// <summary>
+    /// Retorna/define o tamanho do buffer de escrita.
+    /// </summary>
 
-        int WriteBufferSize { get; set; }
-    }
+    int WriteBufferSize { get; set; }
 }

@@ -32,39 +32,38 @@
 using System;
 using System.IO;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+internal sealed class OpenRawStream : OpenDeviceStream<RawConfig>
 {
-    internal sealed class OpenRawStream : OpenDeviceStream<RawConfig>
+    #region Constructor
+
+    public OpenRawStream(RawConfig config) : base(config)
     {
-        #region Constructor
-
-        public OpenRawStream(RawConfig config) : base(config)
-        {
-        }
-
-        #endregion Constructor
-
-        #region Properties
-
-        protected override int Available => 0;
-
-        #endregion Properties
-
-        #region Methods
-
-        protected override bool OpenInternal()
-        {
-            Writer = new BinaryWriter(new RawPrinterStream(Config.Impressora));
-            return true;
-        }
-
-        protected override bool CloseInternal()
-        {
-            Writer?.Dispose();
-            Writer = null;
-            return true;
-        }
-
-        #endregion Methods
     }
+
+    #endregion Constructor
+
+    #region Properties
+
+    protected override int Available => 0;
+
+    #endregion Properties
+
+    #region Methods
+
+    protected override bool OpenInternal()
+    {
+        Writer = new BinaryWriter(new RawPrinterStream(Config.Impressora));
+        return true;
+    }
+
+    protected override bool CloseInternal()
+    {
+        Writer?.Dispose();
+        Writer = null;
+        return true;
+    }
+
+    #endregion Methods
 }

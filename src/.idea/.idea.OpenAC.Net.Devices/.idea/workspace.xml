@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../.github/workflows/publish.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/OpenAC.Net.Devices.Blazor.csproj" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebSerial/OpenWebSerialStream.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebSerial/WebSerialConfig.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebSerial/WebSerialReadStream.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebSerial/WebWriteSerialStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/encodings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/indexLayout.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/indexLayout.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Bluetooth/OpenAC.Net.Devices.Bluetooth.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Bluetooth/OpenBlueToothStream.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.USB/OpenAC.Net.Devices.USB.csproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.USB/OpenUsbStream.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.USB/UsbConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/Extensions/MemoryStreamExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.sln" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Commom/ByteArrayBuilder.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Commom/ByteArrayBuilder.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/BaseConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/BaseConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/EventHandlerExtension.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/EventHandlerExtension.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/FileDevice/FileConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/FileDevice/FileConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/FileDevice/OpenFileStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/FileDevice/OpenFileStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/MemoryStreamExtensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/MemoryStreamExtensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/OpenRawStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/OpenRawStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/RawConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/RawConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/RawPrinterStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Raw/RawPrinterStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Serial/OpenSerialStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Serial/OpenSerialStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Serial/SerialConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/Serial/SerialConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/TCP/OpenTcpStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/TCP/OpenTcpStream.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/TCP/TCPConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/Devices/TCP/TCPConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/IDeviceConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/IDeviceConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenAC.Net.Devices.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenAC.Net.Devices.csproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceFactory.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceFactory.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceStream.Extendend.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceStream.Extendend.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceStream.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenDeviceStream.cs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "rftd"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/OpenAC-Net/OpenAC.Net.Devices.git",
+    "accountId": "6c8b66d3-0f29-4ed5-8d0e-b04260f2e20b"
+  }
+}]]></component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 0
+}]]></component>
+  <component name="ProjectId" id="2y9vJ0cdikIBauOQHqthtE45EhC" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="" />
+      <created>1749259529618</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1749259529618</updated>
+      <workItem from="1749259530287" duration="348000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.OperationCanceledException" breakIfHandledByOtherCode="false" displayValue="System.OperationCanceledException" />
+          <option name="timeStamp" value="1" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.Tasks.TaskCanceledException" breakIfHandledByOtherCode="false" displayValue="System.Threading.Tasks.TaskCanceledException" />
+          <option name="timeStamp" value="2" />
+        </breakpoint>
+        <breakpoint enabled="true" type="DotNet_Exception_Breakpoints">
+          <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
+          <option name="timeStamp" value="3" />
+        </breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

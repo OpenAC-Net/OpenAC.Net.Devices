@@ -32,17 +32,16 @@
 using System;
 using System.IO;
 
-namespace OpenAC.Net.Devices
+namespace OpenAC.Net.Devices;
+
+internal static class MemoryStreamExtensions
 {
-    internal static class MemoryStreamExtensions
+    public static void Clear(this MemoryStream ms)
     {
-        public static void Clear(this MemoryStream ms)
-        {
-            var buffer = ms.GetBuffer();
-            Array.Clear(buffer, 0, buffer.Length);
-            ms.Position = 0;
-            ms.SetLength(0);
-            ms.Capacity = 0;
-        }
+        var buffer = ms.GetBuffer();
+        Array.Clear(buffer, 0, buffer.Length);
+        ms.Position = 0;
+        ms.SetLength(0);
+        ms.Capacity = 0;
     }
 }
