@@ -64,11 +64,18 @@ public class SerialConfig : BaseConfig
     public SerialConfig() : base("Serial")
     {
         windowsPorts = ["COM", "LPT"];
-        unixesPorts = Directory.GetFiles("/dev/", "tty*")   // Linux / FreeBSD / macOS
-            .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
-            .Concat(Directory.GetFiles("/dev/", "cu*"))     // FreeBSD / macOS
-            .Distinct()
-            .ToArray();
+        if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
+        {
+            unixesPorts = Directory.GetFiles("/dev/", "tty*") // Linux / FreeBSD / macOS
+                .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
+                .Concat(Directory.GetFiles("/dev/", "cu*")) // FreeBSD / macOS
+                .Distinct()
+                .ToArray();
+        }
+        else
+        {
+            unixesPorts = [];
+        }
 
         Porta = "COM1";
         Baud = 9600;
