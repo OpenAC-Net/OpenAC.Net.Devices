@@ -36,6 +36,9 @@ using System.Runtime.InteropServices;
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Stream para envio de dados diretamente para uma impressora no modo RAW.
+/// </summary>
 public class RawPrinterStream : Stream
 {
     #region InnerTypes
@@ -48,9 +51,9 @@ public class RawPrinterStream : Stream
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         public class DOCINFOA
         {
-            [MarshalAs(UnmanagedType.LPStr)] public string pDocName;
-            [MarshalAs(UnmanagedType.LPStr)] public string pOutputFile;
-            [MarshalAs(UnmanagedType.LPStr)] public string pDataType;
+            [MarshalAs(UnmanagedType.LPStr)] public string? pDocName;
+            [MarshalAs(UnmanagedType.LPStr)] public string? pOutputFile;
+            [MarshalAs(UnmanagedType.LPStr)] public string? pDataType;
         }
 
         #endregion InnerTypes
@@ -147,7 +150,7 @@ public class RawPrinterStream : Stream
 
     #region Fields
 
-    private MemoryStream stream;
+    private MemoryStream? stream;
 
     #endregion Fields
 
@@ -167,38 +170,52 @@ public class RawPrinterStream : Stream
 
     #region Properties
 
+    /// <summary>
+    /// Obtém o nome da impressora para onde os dados serão enviados.
+    /// </summary>
     public string PrinterName { get; }
 
+    /// <inheritdoc />
     public override bool CanRead => false;
 
+    /// <inheritdoc />
     public override bool CanSeek => false;
 
+    /// <inheritdoc />
     public override bool CanWrite => true;
 
-    public override long Length => stream.Length;
+    /// <inheritdoc />
+    public override long Length => stream?.Length ?? 0;
 
+    /// <inheritdoc />
     public override long Position
     {
-        get => stream.Position;
-        set => stream.Position = value;
+        get => stream?.Position ?? 0;
+        set
+        {
+            if (stream == null) return;
+            
+            stream.Position = value;
+        }
     }
 
     #endregion Properties
 
     #region Methods
 
+    /// <inheritdoc />
     public override void Flush()
     {
         try
         {
-            var buffer = stream.ToArray();
+            var buffer = stream?.ToArray() ?? [];
 
             if (Environment.OSVersion.Platform == PlatformID.Unix)
                 Unix.SendToPrinter(PrinterName, buffer);
             else
                 Windows.SendToPrinter(PrinterName, buffer);
 
-            stream.Clear();
+            stream?.Clear();
         }
         catch (Exception e)
         {
@@ -206,20 +223,25 @@ public class RawPrinterStream : Stream
         }
     }
 
+    /// <inheritdoc />
     public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
 
+    /// <inheritdoc />
     public override void SetLength(long value) => throw new NotImplementedException();
 
+    /// <inheritdoc />
     public override int Read(byte[] buffer, int offset, int count) => throw new NotImplementedException();
 
-    public override void Write(byte[] buffer, int offset, int count) => stream.Write(buffer, offset, count);
+    /// <inheritdoc />
+    public override void Write(byte[] buffer, int offset, int count) => stream?.Write(buffer, offset, count);
 
+    /// <inheritdoc />
     protected override void Dispose(bool disposing)
     {
         if (!disposing) return;
 
         Flush();
-        stream.Dispose();
+        stream?.Dispose();
         stream = null;
     }
 

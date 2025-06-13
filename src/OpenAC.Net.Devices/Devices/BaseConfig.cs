@@ -57,19 +57,23 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
     #region Public Events
 
     /// <summary>
-    ///   Ocorre quando um valor da propriedade está sendo alterado.
+    /// Evento disparado antes de uma propriedade ser alterada.
     /// </summary>
-    public event PropertyChangingEventHandler PropertyChanging;
+    public event PropertyChangingEventHandler? PropertyChanging;
 
     /// <summary>
-    /// Ocorre quando um valor de propriedade é alterado.
+    /// Evento disparado após uma propriedade ser alterada.
     /// </summary>
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion Public Events
 
     #region Constructors
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="BaseConfig"/>.
+    /// </summary>
+    /// <param name="name">Nome da configuração do dispositivo.</param>
     protected BaseConfig(string name)
     {
         Name = name;
@@ -85,38 +89,59 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
 
     #region Properties
 
+    /// <summary>
+    /// Nome da configuração do dispositivo.
+    /// </summary>
     public string Name { get; }
 
+    /// <summary>
+    /// Indica se o controle da porta do dispositivo está habilitado.
+    /// </summary>
     public bool ControlePorta
     {
         get => controlePorta;
         set => SetProperty(ref controlePorta, value);
     }
 
+    /// <summary>
+    /// Tempo limite (em segundos) para operações do dispositivo.
+    /// </summary>
     public int TimeOut
     {
         get => timeOut;
         set => SetProperty(ref timeOut, Math.Max(value, 1));
     }
 
+    /// <summary>
+    /// Número de tentativas para operações do dispositivo.
+    /// </summary>
     public int Tentativas
     {
         get => tentativas;
         set => SetProperty(ref tentativas, Math.Max(value, 1));
     }
 
+    /// <summary>
+    /// Intervalo em milissegundos entre as tentativas de operação do dispositivo.
+    /// </summary>
     public int IntervaloTentativas
     {
         get => intervaloTentativas;
         set => SetProperty(ref intervaloTentativas, Math.Max(value, 1));
     }
 
+    /// <summary>
+    /// Tamanho do buffer de leitura do dispositivo.
+    /// </summary>
     public int ReadBufferSize
     {
         get => readBufferSize;
         set => SetProperty(ref readBufferSize, Math.Max(value, 1));
     }
 
+    /// <summary>
+    /// Tamanho do buffer de escrita do dispositivo.
+    /// </summary>
     public int WriteBufferSize
     {
         get => writeBufferSize;
@@ -128,10 +153,10 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
     #region Protected Methods
 
     /// <summary>
-    /// Raises the PropertyChanged event.
+    /// Dispara o evento <see cref="PropertyChanged"/> para notificar que uma propriedade foi alterada.
     /// </summary>
-    /// <param name="propertyName">Name of the property.</param>
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    /// <param name="propertyName">Nome da propriedade que foi alterada. Preenchido automaticamente pelo compilador se não especificado.</param>
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         Debug.Assert(
             string.IsNullOrEmpty(propertyName) ||
@@ -140,11 +165,11 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
 
         PropertyChanged?.Raise(this, new PropertyChangedEventArgs(propertyName));
     }
-
+    
     /// <summary>
-    /// Raises the PropertyChanged event.
+    /// Dispara o evento <see cref="PropertyChanged"/> para múltiplas propriedades informadas.
     /// </summary>
-    /// <param name="propertyNames">The property names.</param>
+    /// <param name="propertyNames">Nomes das propriedades que foram alteradas.</param>
     protected void OnPropertyChanged(params string[] propertyNames)
     {
         if (propertyNames == null)
@@ -157,12 +182,12 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
             OnPropertyChanged(propertyName);
         }
     }
-
+    
     /// <summary>
-    /// Raises the PropertyChanging event.
+    /// Dispara o evento <see cref="PropertyChanging"/> para notificar que uma propriedade está prestes a ser alterada.
     /// </summary>
-    /// <param name="propertyName">Name of the property.</param>
-    protected virtual void OnPropertyChanging([CallerMemberName] string propertyName = null)
+    /// <param name="propertyName">Nome da propriedade que será alterada. Preenchido automaticamente pelo compilador se não especificado.</param>
+    protected virtual void OnPropertyChanging([CallerMemberName] string? propertyName = null)
     {
         Debug.Assert(string.IsNullOrEmpty(propertyName) ||
                      GetType().GetRuntimeProperty(propertyName) != null,
@@ -170,11 +195,11 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
 
         PropertyChanging?.Raise(this, new PropertyChangingEventArgs(propertyName));
     }
-
+    
     /// <summary>
-    /// Raises the PropertyChanging event.
+    /// Dispara o evento <see cref="PropertyChanging"/> para múltiplas propriedades informadas.
     /// </summary>
-    /// <param name="propertyNames">The property names.</param>
+    /// <param name="propertyNames">Nomes das propriedades que serão alteradas.</param>
     protected void OnPropertyChanging(params string[] propertyNames)
     {
         if (propertyNames == null)
@@ -189,18 +214,19 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
     }
 
     /// <summary>
-    /// Sets the value of the property to the specified value if it has changed.
+    /// Define o valor da propriedade especificada se ela tiver sido alterada.
     /// </summary>
-    /// <typeparam name="TProp">The type of the property.</typeparam>
-    /// <param name="currentValue">The current value of the property.</param>
-    /// <param name="newValue">The new value of the property.</param>
-    /// <param name="propertyName">Name of the property.</param>
-    /// <returns><c>true</c> if the property was changed, otherwise <c>false</c>.</returns>
+    /// <typeparam name="TProp">Tipo da propriedade.</typeparam>
+    /// <param name="currentValue">Valor atual da propriedade (por referência).</param>
+    /// <param name="newValue">Novo valor a ser definido.</param>
+    /// <param name="propertyName">Nome da propriedade (opcional, preenchido automaticamente).</param>
+    /// <param name="onChanged">Ação opcional a ser executada após a alteração.</param>
+    /// <returns><c>true</c> se a propriedade foi alterada; caso contrário, <c>false</c>.</returns>
     protected bool SetProperty<TProp>(
         ref TProp currentValue,
         TProp newValue,
         [CallerMemberName] string propertyName = "",
-        Action onChanged = null)
+        Action? onChanged = null)
     {
         if (EqualityComparer<TProp>.Default.Equals(currentValue, newValue))
             return false;
@@ -212,15 +238,15 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
 
         return true;
     }
-
+    
     /// <summary>
-    /// Sets the value of the property to the specified value if it has changed.
+    /// Define o valor da propriedade especificada se ela tiver sido alterada, notificando múltiplas propriedades.
     /// </summary>
-    /// <typeparam name="TProp">The type of the property.</typeparam>
-    /// <param name="currentValue">The current value of the property.</param>
-    /// <param name="newValue">The new value of the property.</param>
-    /// <param name="propertyNames">The names of all properties changed.</param>
-    /// <returns><c>true</c> if the property was changed, otherwise <c>false</c>.</returns>
+    /// <typeparam name="TProp">Tipo da propriedade.</typeparam>
+    /// <param name="currentValue">Valor atual da propriedade (por referência).</param>
+    /// <param name="newValue">Novo valor a ser definido.</param>
+    /// <param name="propertyNames">Nomes das propriedades a serem notificadas.</param>
+    /// <returns><c>true</c> se a propriedade foi alterada; caso contrário, <c>false</c>.</returns>
     protected bool SetProperty<TProp>(
         ref TProp currentValue,
         TProp newValue,
@@ -246,7 +272,7 @@ public abstract class BaseConfig : INotifyPropertyChanged, INotifyPropertyChangi
     protected bool SetProperty(
         Func<bool> equal,
         Action action,
-        [CallerMemberName] string propertyName = null)
+        [CallerMemberName] string? propertyName = null)
     {
         if (equal())
         {
