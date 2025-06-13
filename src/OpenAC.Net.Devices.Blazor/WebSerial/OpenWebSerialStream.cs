@@ -14,7 +14,7 @@ public class OpenWebSerialStream(WebSerialConfig config) : OpenDeviceStream<WebS
         
         if (!Config.Port.Connected) return;
         
-        Reader.BaseStream.Flush();
+        Reader?.BaseStream.Flush();
     }
 
     protected override bool OpenInternal()

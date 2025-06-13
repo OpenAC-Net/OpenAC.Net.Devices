@@ -35,22 +35,13 @@ using System.Threading.Tasks;
 
 namespace OpenAC.Net.Devices;
 
-internal sealed class OpenSerialStream : OpenDeviceStream<SerialConfig>
+internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<SerialConfig>(config)
 {
     #region Fields
 
-    private readonly SerialPort serialPort;
+    private readonly SerialPort serialPort = new();
 
     #endregion Fields
-
-    #region Constructor
-
-    public OpenSerialStream(SerialConfig config) : base(config)
-    {
-        serialPort = new SerialPort();
-    }
-
-    #endregion Constructor
 
     #region Properties
 

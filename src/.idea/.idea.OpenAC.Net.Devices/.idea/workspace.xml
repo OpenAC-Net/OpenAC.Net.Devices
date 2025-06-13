@@ -4,33 +4,49 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "rftd"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;rftd&quot;
   }
-}]]></component>
+}</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
     "url": "https://github.com/OpenAC-Net/OpenAC.Net.Devices.git",
     "accountId": "6c8b66d3-0f29-4ed5-8d0e-b04260f2e20b"
+  },
+  "recentNewPullRequestHead": {
+    "server": {
+      "useHttp": false,
+      "host": "github.com",
+      "port": null,
+      "suffix": null
+    },
+    "owner": "OpenAC-Net",
+    "repository": "OpenAC.Net.Devices"
   }
 }]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/bb06f64c178142b0b2d10172f56d4911e8e928/dd/1302ff9d/PlatformID.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 0
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
   <component name="ProjectId" id="2y9vJ0cdikIBauOQHqthtE45EhC" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -41,7 +57,7 @@
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "#3 on correção-seriaport",
     "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
@@ -60,6 +76,7 @@
       <option name="presentableId" value="Default" />
       <updated>1749259529618</updated>
       <workItem from="1749259530287" duration="1692000" />
+      <workItem from="1749839710526" duration="587000" />
     </task>
     <task id="LOCAL-00001" summary="Adicionado o projeto OpenAC.Net.Devices.Blazor em testes para usar webserial.">
       <option name="closed" value="true" />
@@ -77,7 +94,15 @@
       <option name="project" value="LOCAL" />
       <updated>1749260631682</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Correção de erro na inicialização da classe SerialConfig.">
+      <option name="closed" value="true" />
+      <created>1749840225471</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1749840225471</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -89,7 +114,8 @@
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Adicionado o projeto OpenAC.Net.Devices.Blazor em testes para usar webserial." />
     <MESSAGE value="Ajustes na geração do pacote nuget." />
-    <option name="LAST_COMMIT_MESSAGE" value="Ajustes na geração do pacote nuget." />
+    <MESSAGE value="Correção de erro na inicialização da classe SerialConfig." />
+    <option name="LAST_COMMIT_MESSAGE" value="Correção de erro na inicialização da classe SerialConfig." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

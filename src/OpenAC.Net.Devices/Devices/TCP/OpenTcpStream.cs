@@ -38,23 +38,30 @@ using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Implementa um stream de dispositivo TCP baseado em <see cref="OpenDeviceStream{TConfig}"/>.
+/// </summary>
 internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
 {
     #region Fields
 
-    private TcpClient client;
+    private TcpClient? client;
     private readonly IPEndPoint conEndPoint;
 
     #endregion Fields
 
     #region Constructor
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="OpenTcpStream"/>.
+    /// </summary>
+    /// <param name="config">Configuração TCP a ser utilizada.</param>
     public OpenTcpStream(TCPConfig config) : base(config)
     {
-        Guard.Against<ArgumentException>(config.IP.IsEmpty(), "Endereço não informados");
+        Guard.Against<ArgumentException>(config.IP!.IsEmpty(), "Endereço não informados");
         Guard.Against<ArgumentException>(config.Porta < 1, "Porta não informados");
 
-        conEndPoint = new IPEndPoint(IPAddress.Parse(config.IP), config.Porta);
+        conEndPoint = new IPEndPoint(IPAddress.Parse(config.IP!), config.Porta);
         client = new TcpClient();
     }
 
@@ -68,7 +75,7 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
 
     #region Methods
 
-    public override async void Limpar()
+    public override void Limpar()
     {
         if (client is not { Connected: true }) return;
 
@@ -77,13 +84,14 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
         while (client.Available > 0)
         {
             var inbyte = new byte[1];
-            await stream.ReadAsync(inbyte, 0, 1);
+            _ = stream.Read(inbyte, 0, 1);
         }
     }
 
     protected override bool OpenInternal()
     {
-        if (client.Connected) return false;
+        if(client is null) throw new ArgumentNullException(nameof(client));
+        if (client is { Connected: true }) return false;
 
         client.Connect(conEndPoint);
 
@@ -96,9 +104,11 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
 
     protected override bool CloseInternal()
     {
-        if (!client.Connected) return false;
+        if (client is { Connected: false }) return false;
 
-        ((IDisposable)client)?.Dispose();
+        if(client is IDisposable disposable)
+            disposable.Dispose();
+        
         Reader?.Dispose();
         Writer?.Dispose();
 
@@ -118,7 +128,8 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
     protected override void DisposeManaged()
     {
         base.DisposeManaged();
-        ((IDisposable)client)?.Dispose();
+        if(client is IDisposable disposable)
+            disposable.Dispose();
     }
 
     #endregion Dispose Methods

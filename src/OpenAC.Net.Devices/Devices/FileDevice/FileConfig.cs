@@ -33,21 +33,31 @@ using System.Text;
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Configuração para dispositivos do tipo arquivo.
+/// </summary>
 public sealed class FileConfig : BaseConfig
 {
     #region Fields
 
-    private string file;
+    private string? file;
     private bool createIfNotExits;
 
     #endregion Fields
 
     #region Constructors
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="FileConfig"/> com o caminho do arquivo especificado.
+    /// </summary>
     public FileConfig() : base("File")
     {
     }
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="FileConfig"/> com o caminho do arquivo especificado.
+    /// </summary>
+    /// <param name="file">O caminho do arquivo a ser utilizado pelo dispositivo.</param>
     public FileConfig(string file) : this()
     {
         this.file = file;
@@ -57,12 +67,18 @@ public sealed class FileConfig : BaseConfig
 
     #region Properties
 
-    public string File
+    /// <summary>
+    /// Obtém ou define o caminho do arquivo a ser utilizado pelo dispositivo.
+    /// </summary>
+    public string? File
     {
         get => file;
         set => SetProperty(ref file, value);
     }
 
+    /// <summary>
+    /// Obtém ou define se o arquivo deve ser criado caso não exista.
+    /// </summary>
     public bool CreateIfNotExits
     {
         get => createIfNotExits;

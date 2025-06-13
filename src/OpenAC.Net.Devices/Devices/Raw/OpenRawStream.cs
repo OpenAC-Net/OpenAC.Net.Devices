@@ -54,7 +54,7 @@ internal sealed class OpenRawStream : OpenDeviceStream<RawConfig>
 
     protected override bool OpenInternal()
     {
-        Writer = new BinaryWriter(new RawPrinterStream(Config.Impressora));
+        Writer = new BinaryWriter(new RawPrinterStream(Config.Impressora ?? ""));
         return true;
     }
 

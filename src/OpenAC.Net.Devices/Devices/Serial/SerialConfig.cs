@@ -77,11 +77,11 @@ public class SerialConfig : BaseConfig
             unixesPorts = [];
         }
 
-        Porta = "COM1";
-        Baud = 9600;
-        DataBits = 8;
-        Parity = Parity.None;
-        StopBits = StopBits.One;
+        porta = "COM1";
+        baud = 9600;
+        dataBits = 8;
+        parity = Parity.None;
+        stopBits = StopBits.One;
         WriteBufferSize = 2048;
         ReadBufferSize = 4096;
         Handshake = Handshake.None;

@@ -36,19 +36,27 @@ using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Implementa um stream de dispositivo baseado em arquivo, utilizando <see cref="FileStream"/>.
+/// </summary>
 internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
 {
     #region Fields
 
-    private FileStream client;
+    private FileStream? client;
 
     #endregion Fields
 
     #region Constructor
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="OpenFileStream"/>.
+    /// </summary>
+    /// <param name="config">Configuração do arquivo.</param>
     public OpenFileStream(FileConfig config) : base(config)
     {
-        Guard.Against<ArgumentException>(config.File.IsEmpty(), "Arquivo não informado.");
+        if(Config.File!.IsEmpty()) 
+            throw new ArgumentException("O caminho do arquivo não foi informado.", nameof(Config.File));
     }
 
     #endregion Constructor
@@ -64,8 +72,8 @@ internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
     protected override bool OpenInternal()
     {
         if (client != null) return false;
-
-        client = File.Open(Config.File, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
+        
+        client = File.Open(Config.File!, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
         Writer = new BinaryWriter(client);
 
         return true;

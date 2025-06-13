@@ -31,21 +31,32 @@
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Representa a configuração para conexão TCP.
+/// </summary>
 public sealed class TCPConfig : BaseConfig
 {
     #region Fields
 
-    private string ip;
+    private string? ip;
     private int porta;
 
     #endregion Fields
 
     #region Constructors
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="TCPConfig"/> com valores padrão.
+    /// </summary>
     public TCPConfig() : base("TCP")
     {
     }
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="TCPConfig"/> com o IP e a porta especificados.
+    /// </summary>
+    /// <param name="ip">Endereço IP para conexão.</param>
+    /// <param name="porta">Porta TCP para conexão.</param>
     public TCPConfig(string ip, int porta) : this()
     {
         this.ip = ip;
@@ -56,12 +67,18 @@ public sealed class TCPConfig : BaseConfig
 
     #region Properties
 
-    public string IP
+    /// <summary>
+    /// Obtém ou define o endereço IP.
+    /// </summary>
+    public string? IP
     {
         get => ip;
         set => SetProperty(ref ip, value);
     }
 
+    /// <summary>
+    /// Obtém ou define a porta TCP.
+    /// </summary>
     public int Porta
     {
         get => porta;

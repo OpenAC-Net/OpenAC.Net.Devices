@@ -107,9 +107,14 @@ public class ByteArrayBuilder : IDisposable
 
     #region Methods
 
+    /// <summary>
+    /// Adiciona um único byte ao construtor.
+    /// </summary>
+    /// <param name="b">O byte a ser adicionado.</param>
+    /// <returns>O próprio <see cref="ByteArrayBuilder"/> para encadeamento.</returns>
     public ByteArrayBuilder Append(byte b)
     {
-        AddBytes(new[] { b });
+        AddBytes([b]);
         return this;
     }
 

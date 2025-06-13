@@ -171,7 +171,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
 
                 try
                 {
-                    Writer.Write(dados, bytePointer, count);
+                    Writer?.Write(dados, bytePointer, count);
                 }
                 catch (IOException ex)
                 {
@@ -183,7 +183,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
 
                     CloseInternal();
                     OpenInternal();
-                    Writer.Write(dados, bytePointer, count);
+                    Writer?.Write(dados, bytePointer, count);
                 }
 
                 bytePointer += count;
@@ -219,7 +219,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
 
                 try
                 {
-                    Writer.Write(dados, bytePointer, count);
+                    Writer?.Write(dados, bytePointer, count);
                 }
                 catch (IOException ex)
                 {
@@ -231,7 +231,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
 
                     CloseInternal();
                     OpenInternal();
-                    Writer.Write(dados, bytePointer, count);
+                    Writer?.Write(dados, bytePointer, count);
                 }
 
                 bytePointer += count;
@@ -249,7 +249,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
                 try
                 {
                     var inbyte = new byte[bufferSize];
-                    var read = Reader.Read(inbyte, 0, bufferSize);
+                    var read = Reader?.Read(inbyte, 0, bufferSize) ?? 0;
                     if (read < 1) continue;
 
                     ret.Append(inbyte.Take(read));
@@ -294,7 +294,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
                 try
                 {
                     var inbyte = new byte[bufferSize];
-                    var read = Reader.Read(inbyte, 0, bufferSize);
+                    var read = Reader?.Read(inbyte, 0, bufferSize) ?? 0;
                     if (read < 1) continue;
 
                     ret.Append(inbyte.Take(read));

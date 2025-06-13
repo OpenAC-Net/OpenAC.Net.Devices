@@ -29,24 +29,32 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Text;
-
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Configuração para impressora RAW.
+/// </summary>
 public sealed class RawConfig : BaseConfig
 {
     #region Fields
 
-    private string impressora;
+    private string? impressora;
 
     #endregion Fields
 
     #region Constructors
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="RawConfig"/> com o tipo "RAW".
+    /// </summary>
     public RawConfig() : base("RAW")
     {
     }
 
+    /// <summary>
+    /// Inicializa uma nova instância da classe <see cref="RawConfig"/> com o nome da impressora.
+    /// </summary>
+    /// <param name="impressora">Nome da impressora.</param>
     public RawConfig(string impressora) : this()
     {
         this.impressora = impressora;
@@ -56,7 +64,10 @@ public sealed class RawConfig : BaseConfig
 
     #region Properties
 
-    public string Impressora
+    /// <summary>
+    /// Obtém ou define o nome da impressora.
+    /// </summary>
+    public string? Impressora
     {
         get => impressora;
         set => SetProperty(ref impressora, value);
