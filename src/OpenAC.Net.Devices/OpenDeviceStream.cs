@@ -124,9 +124,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
                         $"- Config: {Config.Name}" + Environment.NewLine +
                         $"{new string('-', 80)}");
 
-        if (Config.ControlePorta && Conectado)
-            Conectado = false;
-        else if (CloseInternal())
+        if (Config.ControlePorta && Conectado || CloseInternal())
             Conectado = false;
     }
 

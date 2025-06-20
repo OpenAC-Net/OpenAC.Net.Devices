@@ -3,10 +3,20 @@ using SpawnDev.BlazorJS.JSObjects;
 
 namespace OpenAC.Net.Devices.Blazor.WebSerial;
 
+/// <summary>
+/// Implementa um stream de comunicação serial via WebSerial para uso em aplicações Blazor.
+/// </summary>
 public class OpenWebSerialStream(WebSerialConfig config) : OpenDeviceStream<WebSerialConfig>(config)
 {
+    /// <summary>
+    /// Obtém a quantidade de bytes disponíveis para leitura no buffer.
+    /// </summary>
     protected override int Available => (int)((Reader?.BaseStream.Length ?? 0) - (Reader?.BaseStream.Position ?? 0));
 
+    /// <summary>
+    /// Limpa o buffer de leitura da porta serial.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">Lançada se a porta serial não estiver configurada.</exception>
     public override void Limpar()
     {
         if(Config.Port == null)
@@ -17,6 +27,11 @@ public class OpenWebSerialStream(WebSerialConfig config) : OpenDeviceStream<WebS
         Reader?.BaseStream.Flush();
     }
 
+    /// <summary>
+    /// Abre a porta serial com as configurações especificadas.
+    /// </summary>
+    /// <returns>Verdadeiro se a porta foi aberta com sucesso, falso caso contrário.</returns>
+    /// <exception cref="InvalidOperationException">Lançada se a porta serial não estiver configurada.</exception>
     protected override bool OpenInternal()
     {
         if(Config.Port == null)
@@ -47,6 +62,11 @@ public class OpenWebSerialStream(WebSerialConfig config) : OpenDeviceStream<WebS
         }
     }
 
+    /// <summary>
+    /// Fecha a porta serial e libera os recursos associados.
+    /// </summary>
+    /// <returns>Verdadeiro se a porta foi fechada com sucesso.</returns>
+    /// <exception cref="InvalidOperationException">Lançada se a porta serial não estiver configurada.</exception>
     protected override bool CloseInternal()
     {
         if(Config.Port == null)
