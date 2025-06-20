@@ -35,27 +35,38 @@ using System.Threading.Tasks;
 
 namespace OpenAC.Net.Devices;
 
+/// <summary>
+/// Implementa um stream de dispositivo serial baseado em <see cref="SerialPort"/>.
+/// </summary>
 internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<SerialConfig>(config)
 {
     #region Fields
 
+    /// <summary>
+    /// Instância do <see cref="SerialPort"/> utilizada para comunicação.
+    /// </summary>
     private readonly SerialPort serialPort = new();
 
     #endregion Fields
 
     #region Properties
 
+    /// <inheritdoc/>
     protected override int Available => serialPort?.BytesToRead ?? 0;
 
     #endregion Properties
 
     #region Methods
 
+    /// <summary>
+    /// Limpa o buffer de entrada da porta serial.
+    /// </summary>
     public override void Limpar()
     {
         if (serialPort.IsOpen) serialPort.DiscardInBuffer();
     }
 
+    /// <inheritdoc/>
     protected override bool OpenInternal()
     {
         if (serialPort.IsOpen) return false;
@@ -69,6 +80,7 @@ internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<S
         return serialPort.IsOpen;
     }
 
+    /// <inheritdoc/>
     protected override bool CloseInternal()
     {
         if (!serialPort.IsOpen) return false;
@@ -83,6 +95,9 @@ internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<S
         return !serialPort.IsOpen;
     }
 
+    /// <summary>
+    /// Configura os parâmetros da porta serial conforme o <see cref="SerialConfig"/>.
+    /// </summary>
     private void ConfigSerial()
     {
         serialPort.PortName = Config.Porta;
@@ -101,6 +116,7 @@ internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<S
 
     #region Dispose Methods
 
+    /// <inheritdoc/>
     protected override void DisposeManaged()
     {
         base.DisposeManaged();

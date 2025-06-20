@@ -34,14 +34,26 @@ using Array = System.Array;
 
 namespace OpenAC.Net.Devices.Blazor.Extensions;
 
+/// <summary>
+/// Métodos de extensão para <see cref="MemoryStream"/> relacionados ao Blazor.
+/// </summary>
 internal static class MemoryStreamExtensions
 {
+    /// <summary>
+    /// Converte o conteúdo do <see cref="MemoryStream"/> em um <see cref="ArrayBuffer"/>.
+    /// </summary>
+    /// <param name="ms">O <see cref="MemoryStream"/> de origem.</param>
+    /// <returns>Um <see cref="ArrayBuffer"/> contendo os dados do stream.</returns>
     public static ArrayBuffer ToArrayBuffer(this MemoryStream ms)
     {
         using var uint8Array = new Uint8Array(ms.ToArray());
         return uint8Array.Buffer;
     }
     
+    /// <summary>
+    /// Limpa o conteúdo do <see cref="MemoryStream"/>, zerando o buffer e redefinindo o tamanho e a posição.
+    /// </summary>
+    /// <param name="ms">O <see cref="MemoryStream"/> a ser limpo.</param>
     public static void Clear(this MemoryStream ms)
     {
         var buffer = ms.GetBuffer();

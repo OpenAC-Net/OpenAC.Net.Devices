@@ -31,7 +31,6 @@
 
 using System;
 using System.IO;
-using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 
 namespace OpenAC.Net.Devices;

@@ -29,8 +29,6 @@
 // <summary></summary>
 // ***********************************************************************
 
-using System.Text;
-
 namespace OpenAC.Net.Devices;
 
 /// <summary>
