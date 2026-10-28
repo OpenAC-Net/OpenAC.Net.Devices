@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : OriginalGriff
 // Created          : 26-10-2012
@@ -114,7 +114,22 @@ public class ByteArrayBuilder : IDisposable
     /// <returns>O próprio <see cref="ByteArrayBuilder"/> para encadeamento.</returns>
     public ByteArrayBuilder Append(byte b)
     {
-        AddBytes([b]);
+        store.WriteByte(b);
+        return this;
+    }
+
+    /// <summary>
+    /// Adiciona um segmento de um array de bytes ao construtor.
+    /// </summary>
+    /// <param name="buffer">O array de bytes de origem.</param>
+    /// <param name="offset">O deslocamento inicial em <paramref name="buffer"/>.</param>
+    /// <param name="count">A quantidade de bytes a adicionar.</param>
+    /// <returns>O próprio <see cref="ByteArrayBuilder"/> para encadeamento.</returns>
+    public ByteArrayBuilder Append(byte[] buffer, int offset, int count)
+    {
+        if (count > 0)
+            store.Write(buffer, offset, count);
+
         return this;
     }
 
@@ -193,22 +208,6 @@ public class ByteArrayBuilder : IDisposable
     private void AddBytes(byte[] byteArray)
     {
         store.Write(byteArray, 0, byteArray.Length);
-    }
-
-    /// <summary>
-    /// Reads a specific number of bytes from the store.
-    /// </summary>
-    /// <param name="length">The length.</param>
-    /// <returns>The byte array.</returns>
-    private byte[] GetBytes(int length)
-    {
-        var data = new byte[length];
-        if (length <= 0) return data;
-
-        var read = store.Read(data, 0, length);
-        if (read != length) throw new ApplicationException("Buffer did not contain " + length + " bytes");
-
-        return data;
     }
 
     /// <summary>

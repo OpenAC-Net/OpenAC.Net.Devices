@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -71,8 +71,11 @@ internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
     protected override bool OpenInternal()
     {
         if (client != null) return false;
-        
-        client = File.Open(Config.File!, Config.CreateIfNotExits ? FileMode.OpenOrCreate : FileMode.Open);
+        if (Config.File!.IsEmpty())
+            throw new ArgumentException("O caminho do arquivo não foi informado.", nameof(Config.File));
+
+        client = File.Open(Config.File!, Config.CreateIfNotExists ? FileMode.OpenOrCreate : FileMode.Open, FileAccess.Write, FileShare.Read);
+        client.Seek(0, SeekOrigin.End);
         Writer = new BinaryWriter(client);
 
         return true;
@@ -82,8 +85,8 @@ internal sealed class OpenFileStream : OpenDeviceStream<FileConfig>
     {
         if (client == null) return false;
 
-        client?.Dispose();
         Writer?.Dispose();
+        client?.Dispose();
 
         Writer = null;
         client = null;

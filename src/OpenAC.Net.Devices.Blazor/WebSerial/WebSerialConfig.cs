@@ -1,44 +1,23 @@
-﻿using SpawnDev.BlazorJS.JSObjects;
+﻿namespace OpenAC.Net.Devices.Blazor.WebSerial;
 
-namespace OpenAC.Net.Devices.Blazor.WebSerial;
-
-/// <summary>
-/// Representa a configuração para comunicação via WebSerial.
-/// </summary>
-public class WebSerialConfig() : BaseConfig("WebSerial")
+/// <summary>Configura uma porta Web Serial selecionada por WebDeviceService.</summary>
+public class WebSerialConfig : WebDeviceConfig
 {
-    /// <summary>
-    /// Porta serial selecionada.
-    /// </summary>
-    public SerialPort? Port { get; set; }
-    
-    /// <summary>
-    /// Taxa de transmissão em bauds. Padrão: 9600.
-    /// </summary>
+    static WebSerialConfig() => OpenDeviceFactory.Register<WebSerialConfig, OpenWebSerialStream>();
+    public WebSerialConfig() : base("WebSerial") { }
+    public WebSerialConfig(WebDevice port) : this() => Port = port;
+    public WebDevice? Port { get => Device; set => Device = value; }
     public int BaudRate { get; set; } = 9600;
-    
-    /// <summary>
-    /// Tamanho do buffer de leitura/escrita.
-    /// </summary>
     public int? BufferSize { get; set; }
-    
-    /// <summary>
-    /// Número de bits de dados.
-    /// </summary>
     public int? DataBits { get; set; }
-
-    /// <summary>
-    /// Tipo de controle de fluxo.
-    /// </summary>
     public FlowControlType? FlowControl { get; set; }
-    
-    /// <summary>
-    /// Tipo de paridade.
-    /// </summary>
     public ParityType? Parity { get; set; }
-    
-    /// <summary>
-    /// Número de bits de parada.
-    /// </summary>
     public int? StopBits { get; set; }
+    internal override string Kind => "serial";
+    internal override object GetOpenOptions() => new
+    {
+        baudRate = BaudRate, bufferSize = BufferSize, dataBits = DataBits,
+        flowControl = FlowControl?.ToString().ToLowerInvariant(),
+        parity = Parity?.ToString().ToLowerInvariant(), stopBits = StopBits
+    };
 }

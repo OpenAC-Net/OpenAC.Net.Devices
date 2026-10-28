@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -173,18 +173,26 @@ public class RawPrinterStream : Stream
         public static void SendToPrinter(string printerName, byte[] buffer)
         {
             var file = Path.GetTempFileName();
-            File.WriteAllBytes(file, buffer);
-
-            var startInfo = new ProcessStartInfo
+            try
             {
-                UseShellExecute = true,
-                FileName = "lp",
-                Arguments = $"-d \"{printerName}\" {file}"
-            };
+                File.WriteAllBytes(file, buffer);
 
-            var process = Process.Start(startInfo);
-            process?.WaitForExit();
-            File.Delete(file);
+                var startInfo = new ProcessStartInfo
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    FileName = "lp",
+                    Arguments = $"-d \"{printerName}\" \"{file}\""
+                };
+
+                using var process = Process.Start(startInfo);
+                process?.WaitForExit();
+            }
+            finally
+            {
+                if (File.Exists(file))
+                    File.Delete(file);
+            }
         }
     }
 
@@ -250,14 +258,16 @@ public class RawPrinterStream : Stream
     {
         try
         {
-            var buffer = stream?.ToArray() ?? [];
+            if (stream == null || stream.Length == 0) return;
 
-            if (Environment.OSVersion.Platform == PlatformID.Unix)
+            var buffer = stream.ToArray();
+
+            if (Commom.OSPlatformHelper.IsLinux || Commom.OSPlatformHelper.IsMacOS)
                 Unix.SendToPrinter(PrinterName, buffer);
             else
                 Windows.SendToPrinter(PrinterName, buffer);
 
-            stream?.Clear();
+            stream.Clear();
         }
         catch (Exception e)
         {

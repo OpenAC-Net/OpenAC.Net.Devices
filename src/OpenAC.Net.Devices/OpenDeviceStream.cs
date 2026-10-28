@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -31,9 +31,10 @@
 
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Tasks;
 using OpenAC.Net.Core;
 using OpenAC.Net.Core.Logging;
 using OpenAC.Net.Devices.Commom;
@@ -53,7 +54,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     /// <param name="config">Configurações do dispositivo.</param>
     protected OpenDeviceStream(IDeviceConfig config)
     {
-        Config = config;
+        Config = config ?? throw new ArgumentNullException(nameof(config));
     }
 
     #endregion Constructors
@@ -102,7 +103,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     /// <summary>
     /// Abre a conexão com o dispositivo.
     /// </summary>
-    public void Open()
+    public virtual void Open()
     {
         this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
                         $"Open - {DateTime.Now:G}" + Environment.NewLine +
@@ -115,9 +116,26 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     }
 
     /// <summary>
+    /// Abre a conexão com o dispositivo de forma assíncrona.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    public async Task OpenAsync(CancellationToken cancellationToken = default)
+    {
+        this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
+                        $"OpenAsync - {DateTime.Now:G}" + Environment.NewLine +
+                        $"- Config: {Config.Name}" + Environment.NewLine +
+                        $"{new string('-', 80)}");
+
+        Conectado = await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+
+        if (Config.ControlePorta && Conectado)
+            await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>
     /// Fecha a conexão com o dispositivo.
     /// </summary>
-    public void Close()
+    public virtual void Close()
     {
         this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
                         $"Close - {DateTime.Now:G}" + Environment.NewLine +
@@ -125,6 +143,21 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
                         $"{new string('-', 80)}");
 
         if (Config.ControlePorta && Conectado || CloseInternal())
+            Conectado = false;
+    }
+
+    /// <summary>
+    /// Fecha a conexão com o dispositivo de forma assíncrona.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    public async Task CloseAsync(CancellationToken cancellationToken = default)
+    {
+        this.Log().Info($"{new string('-', 80)}" + Environment.NewLine +
+                        $"CloseAsync - {DateTime.Now:G}" + Environment.NewLine +
+                        $"- Config: {Config.Name}" + Environment.NewLine +
+                        $"{new string('-', 80)}");
+
+        if (Config.ControlePorta && Conectado || await CloseInternalAsync(cancellationToken).ConfigureAwait(false))
             Conectado = false;
     }
 
@@ -143,16 +176,38 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     protected abstract bool OpenInternal();
 
     /// <summary>
+    /// Abre a conexão internamente de forma assíncrona para controle de porta.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    /// <returns>Retorna <c>true</c> se a conexão foi aberta com sucesso; caso contrário, <c>false</c>.</returns>
+    protected virtual Task<bool> OpenInternalAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(OpenInternal());
+    }
+
+    /// <summary>
     /// Fecha a conexão internamente para controle de porta.
     /// </summary>
     /// <returns>Retorna <c>true</c> se a conexão foi fechada com sucesso; caso contrário, <c>false</c>.</returns>
     protected abstract bool CloseInternal();
 
     /// <summary>
+    /// Fecha a conexão internamente de forma assíncrona para controle de porta.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    /// <returns>Retorna <c>true</c> se a conexão foi fechada com sucesso; caso contrário, <c>false</c>.</returns>
+    protected virtual Task<bool> CloseInternalAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return Task.FromResult(CloseInternal());
+    }
+
+    /// <summary>
     /// Grava dados na porta de conexão.
     /// </summary>
     /// <param name="dados">Dados a serem enviados.</param>
-    public void Write(byte[] dados)
+    public virtual void Write(byte[] dados)
     {
         if (dados.Length < 1) return;
 
@@ -160,37 +215,34 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
         {
             if (Config.ControlePorta) OpenInternal();
 
-            var bytePointer = 0;
-            var bytesLeft = dados.Length;
-            var tentativas = 0;
-            while (bytesLeft > 0)
-            {
-                var count = Math.Min(Config.WriteBufferSize, bytesLeft);
-
-                try
-                {
-                    Writer?.Write(dados, bytePointer, count);
-                }
-                catch (IOException ex)
-                {
-                    this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
-                    tentativas++;
-                    if (tentativas >= Config.Tentativas) throw;
-
-                    Thread.Sleep(Config.IntervaloTentativas);
-
-                    CloseInternal();
-                    OpenInternal();
-                    Writer?.Write(dados, bytePointer, count);
-                }
-
-                bytePointer += count;
-                bytesLeft -= count;
-            }
+            WriteDados(dados);
         }
         finally
         {
             if (Config.ControlePorta) CloseInternal();
+        }
+    }
+
+    /// <summary>
+    /// Grava dados na porta de conexão de forma assíncrona.
+    /// </summary>
+    /// <param name="dados">Dados a serem enviados.</param>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    public virtual async Task WriteAsync(byte[] dados, CancellationToken cancellationToken = default)
+    {
+        if (dados.Length < 1) return;
+
+        try
+        {
+            if (Config.ControlePorta)
+                await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+
+            await WriteDadosAsync(dados, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            if (Config.ControlePorta)
+                await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 
@@ -200,7 +252,7 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     /// <param name="dados">Dados a serem enviados.</param>
     /// <param name="timeSleep">Tempo de espera entre gravação e leitura.</param>
     /// <returns>Retorna os dados recebidos.</returns>
-    public byte[] WriteRead(byte[] dados, int timeSleep = 10)
+    public virtual byte[] WriteRead(byte[] dados, int timeSleep = 10)
     {
         if (dados.Length < 1) return [];
 
@@ -208,64 +260,11 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
         {
             if (Config.ControlePorta) OpenInternal();
 
-            var bytePointer = 0;
-            var bytesLeft = dados.Length;
-            var tentativas = 0;
-            while (bytesLeft > 0)
-            {
-                var count = Math.Min(Config.WriteBufferSize, bytesLeft);
-
-                try
-                {
-                    Writer?.Write(dados, bytePointer, count);
-                }
-                catch (IOException ex)
-                {
-                    this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
-                    tentativas++;
-                    if (tentativas >= Config.Tentativas) throw;
-
-                    Thread.Sleep(Config.IntervaloTentativas);
-
-                    CloseInternal();
-                    OpenInternal();
-                    Writer?.Write(dados, bytePointer, count);
-                }
-
-                bytePointer += count;
-                bytesLeft -= count;
-            }
+            WriteDados(dados);
 
             Thread.Sleep(timeSleep);
 
-            var ret = new ByteArrayBuilder();
-            var bufferSize = Math.Max(Config.ReadBufferSize, 1);
-            tentativas = 0;
-                
-            while (Available > 0)
-            {
-                try
-                {
-                    var inbyte = new byte[bufferSize];
-                    var read = Reader?.Read(inbyte, 0, bufferSize) ?? 0;
-                    if (read < 1) continue;
-
-                    ret.Append(inbyte.Take(read));
-                }
-                catch (IOException ex)
-                {
-                    this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
-                    tentativas++;
-                    if (tentativas >= Config.Tentativas) throw;
-
-                    Thread.Sleep(Config.IntervaloTentativas);
-
-                    CloseInternal();
-                    OpenInternal();
-                }
-            }
-
-            return ret.ToArray();
+            return ReadDados(reconnectOnError: false);
         }
         finally
         {
@@ -274,48 +273,210 @@ public abstract class OpenDeviceStream : OpenDisposable, IOpenLog
     }
 
     /// <summary>
+    /// Grava e lê o retorno da porta de conexão de forma assíncrona.
+    /// </summary>
+    /// <param name="dados">Dados a serem enviados.</param>
+    /// <param name="timeSleep">Tempo de espera entre gravação e leitura.</param>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    /// <returns>Retorna os dados recebidos.</returns>
+    public virtual async Task<byte[]> WriteReadAsync(byte[] dados, int timeSleep = 10, CancellationToken cancellationToken = default)
+    {
+        if (dados.Length < 1) return [];
+
+        try
+        {
+            if (Config.ControlePorta)
+                await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+
+            await WriteDadosAsync(dados, cancellationToken).ConfigureAwait(false);
+
+            await Task.Delay(timeSleep, cancellationToken).ConfigureAwait(false);
+
+            return await ReadDadosAsync(reconnectOnError: false, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            if (Config.ControlePorta)
+                await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    /// <summary>
     /// Lê dados da porta de conexão.
     /// </summary>
     /// <returns>Retorna os dados lidos.</returns>
-    public byte[] Read()
+    public virtual byte[] Read()
     {
         try
         {
             if (Config.ControlePorta) OpenInternal();
 
-            var ret = new ByteArrayBuilder();
-            var bufferSize = Math.Max(Config.ReadBufferSize, 1);
-            var tentativas = 0;
-
-            while (Available > 0)
-            {
-                try
-                {
-                    var inbyte = new byte[bufferSize];
-                    var read = Reader?.Read(inbyte, 0, bufferSize) ?? 0;
-                    if (read < 1) continue;
-
-                    ret.Append(inbyte.Take(read));
-                }
-                catch (IOException ex)
-                {
-                    this.Log().Error($"[{MethodBase.GetCurrentMethod()?.Name}]: Erro ao enviar dados ao dispositivo", ex);
-                    tentativas++;
-                    if (tentativas >= Config.Tentativas) throw;
-
-                    Thread.Sleep(Config.IntervaloTentativas);
-
-                    CloseInternal();
-                    OpenInternal();
-                }
-            }
-
-            return ret.ToArray();
+            return ReadDados(reconnectOnError: true);
         }
         finally
         {
             if (Config.ControlePorta) CloseInternal();
         }
+    }
+
+    /// <summary>
+    /// Lê dados da porta de conexão de forma assíncrona.
+    /// </summary>
+    /// <param name="cancellationToken">Token de cancelamento da operação.</param>
+    /// <returns>Retorna os dados lidos.</returns>
+    public virtual async Task<byte[]> ReadAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            if (Config.ControlePorta)
+                await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+
+            return await ReadDadosAsync(reconnectOnError: true, cancellationToken).ConfigureAwait(false);
+        }
+        finally
+        {
+            if (Config.ControlePorta)
+                await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
+        }
+    }
+
+    private void WriteDados(byte[] dados, [CallerMemberName] string? methodName = null)
+    {
+        var bytePointer = 0;
+        var bytesLeft = dados.Length;
+        var tentativas = 0;
+        while (bytesLeft > 0)
+        {
+            var count = Math.Min(Config.WriteBufferSize, bytesLeft);
+
+            try
+            {
+                Writer?.Write(dados, bytePointer, count);
+                bytePointer += count;
+                bytesLeft -= count;
+            }
+            catch (IOException ex)
+            {
+                this.Log().Error($"[{methodName}]: Erro ao enviar dados ao dispositivo", ex);
+                tentativas++;
+                if (tentativas >= Config.Tentativas) throw;
+
+                Thread.Sleep(Config.IntervaloTentativas);
+
+                CloseInternal();
+                OpenInternal();
+            }
+        }
+
+        Writer?.Flush();
+    }
+
+    private async Task WriteDadosAsync(byte[] dados, CancellationToken cancellationToken, [CallerMemberName] string? methodName = null)
+    {
+        var bytePointer = 0;
+        var bytesLeft = dados.Length;
+        var tentativas = 0;
+        while (bytesLeft > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var count = Math.Min(Config.WriteBufferSize, bytesLeft);
+
+            try
+            {
+                if (Writer != null)
+                    await Writer.BaseStream.WriteAsync(dados, bytePointer, count, cancellationToken).ConfigureAwait(false);
+
+                bytePointer += count;
+                bytesLeft -= count;
+            }
+            catch (IOException ex)
+            {
+                this.Log().Error($"[{methodName}]: Erro ao enviar dados ao dispositivo", ex);
+                tentativas++;
+                if (tentativas >= Config.Tentativas) throw;
+
+                await Task.Delay(Config.IntervaloTentativas, cancellationToken).ConfigureAwait(false);
+
+                await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
+                await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+            }
+        }
+
+        if (Writer != null)
+            await Writer.BaseStream.FlushAsync(cancellationToken).ConfigureAwait(false);
+    }
+
+    private byte[] ReadDados(bool reconnectOnError, [CallerMemberName] string? methodName = null)
+    {
+        using var ret = new ByteArrayBuilder();
+        var bufferSize = Math.Max(Config.ReadBufferSize, 1);
+        var inbyte = new byte[bufferSize];
+        var tentativas = 0;
+
+        while (Available > 0)
+        {
+            try
+            {
+                var read = Reader?.Read(inbyte, 0, bufferSize) ?? 0;
+                if (read < 1) continue;
+
+                ret.Append(inbyte, 0, read);
+            }
+            catch (IOException ex)
+            {
+                this.Log().Error($"[{methodName}]: Erro ao ler dados do dispositivo", ex);
+                tentativas++;
+                if (tentativas >= Config.Tentativas) throw;
+
+                Thread.Sleep(Config.IntervaloTentativas);
+
+                if (reconnectOnError)
+                {
+                    CloseInternal();
+                    OpenInternal();
+                }
+            }
+        }
+
+        return ret.ToArray();
+    }
+
+    private async Task<byte[]> ReadDadosAsync(bool reconnectOnError, CancellationToken cancellationToken, [CallerMemberName] string? methodName = null)
+    {
+        using var ret = new ByteArrayBuilder();
+        var bufferSize = Math.Max(Config.ReadBufferSize, 1);
+        var inbyte = new byte[bufferSize];
+        var tentativas = 0;
+
+        while (Available > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            try
+            {
+                var read = Reader != null
+                    ? await Reader.BaseStream.ReadAsync(inbyte, 0, bufferSize, cancellationToken).ConfigureAwait(false)
+                    : 0;
+                if (read < 1) continue;
+
+                ret.Append(inbyte, 0, read);
+            }
+            catch (IOException ex)
+            {
+                this.Log().Error($"[{methodName}]: Erro ao ler dados do dispositivo", ex);
+                tentativas++;
+                if (tentativas >= Config.Tentativas) throw;
+
+                await Task.Delay(Config.IntervaloTentativas, cancellationToken).ConfigureAwait(false);
+
+                if (reconnectOnError)
+                {
+                    await CloseInternalAsync(cancellationToken).ConfigureAwait(false);
+                    await OpenInternalAsync(cancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+
+        return ret.ToArray();
     }
 
     /// <summary>

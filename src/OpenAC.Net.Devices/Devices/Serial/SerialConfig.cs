@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -30,7 +30,6 @@
 // ***********************************************************************
 
 using System;
-using System.IO;
 using System.IO.Ports;
 using System.Linq;
 using OpenAC.Net.Core.Extensions;
@@ -51,7 +50,6 @@ public class SerialConfig : BaseConfig
     private StopBits stopBits;
     private Handshake handshake;
     private readonly string[] windowsPorts;
-    private readonly string[] unixesPorts;
 
     #endregion Fields
 
@@ -63,19 +61,7 @@ public class SerialConfig : BaseConfig
     /// </summary>
     public SerialConfig() : base("Serial")
     {
-        windowsPorts = ["COM", "LPT"];
-        if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX)
-        {
-            unixesPorts = Directory.GetFiles("/dev/", "tty*") // Linux / FreeBSD / macOS
-                .Concat(Directory.GetFiles("/dev/", "rfcomm*")) // Linux BT
-                .Concat(Directory.GetFiles("/dev/", "cu*")) // FreeBSD / macOS
-                .Distinct()
-                .ToArray();
-        }
-        else
-        {
-            unixesPorts = [];
-        }
+        windowsPorts = ["COM", "LPT", @"\\.\COM", @"\\.\LPT"];
 
         porta = "COM1";
         baud = 9600;
@@ -100,8 +86,8 @@ public class SerialConfig : BaseConfig
         get => porta;
         set
         {
-            if (!IsValidPort(value)) throw new ArgumentException("Porta ínvalida.");
-            if (!SetProperty(ref porta, value)) return;
+            if (!IsValidPort(value)) throw new ArgumentException("Porta inválida.", nameof(Porta));
+            SetProperty(ref porta, value);
         }
     }
 
@@ -153,13 +139,32 @@ public class SerialConfig : BaseConfig
     #endregion Properties
 
     #region Methods
-    
+
     /// <summary>
     /// Verifica se o nome da porta fornecido é válido.
     /// </summary>
     /// <param name="aPorta">Nome da porta a ser validada.</param>
     /// <returns>Retorna <c>true</c> se a porta for válida; caso contrário, <c>false</c>.</returns>
-    private bool IsValidPort(string aPorta) => !aPorta.IsEmpty() && (windowsPorts.Any(p => aPorta.ToUpper().StartsWith(p)) || unixesPorts.Contains(aPorta));
+    private bool IsValidPort(string aPorta)
+    {
+        if (aPorta.IsEmpty()) return false;
+
+        var trimmed = aPorta.Trim();
+        if (windowsPorts.Any(p => trimmed.StartsWith(p, StringComparison.OrdinalIgnoreCase)))
+            return true;
+
+        if (trimmed.StartsWith("/dev/", StringComparison.Ordinal))
+            return trimmed.Length > 5;
+
+        try
+        {
+            return SerialPort.GetPortNames().Contains(trimmed, StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 
     #endregion Methods
 }

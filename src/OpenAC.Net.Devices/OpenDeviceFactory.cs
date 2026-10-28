@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -30,8 +30,9 @@
 // ***********************************************************************
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
+using System.Reflection;
 using OpenAC.Net.Core;
 
 namespace OpenAC.Net.Devices;
@@ -43,7 +44,7 @@ public static class OpenDeviceFactory
 {
     #region Fields
 
-    private static readonly Dictionary<Type, Type> Communications;
+    private static readonly ConcurrentDictionary<Type, Type> Communications;
 
     #endregion Fields
 
@@ -55,12 +56,14 @@ public static class OpenDeviceFactory
     /// </summary>
     static OpenDeviceFactory()
     {
-        Communications = new Dictionary<Type, Type>
+        Communications = new ConcurrentDictionary<Type, Type>
         {
-            {typeof(SerialConfig), typeof(OpenSerialStream)},
-            {typeof(TCPConfig), typeof(OpenTcpStream)},
-            {typeof(RawConfig), typeof(OpenRawStream)},
-            {typeof(FileConfig), typeof(OpenFileStream)}
+            [typeof(SerialConfig)] = typeof(OpenSerialStream),
+            [typeof(TCPConfig)] = typeof(OpenTcpStream),
+            [typeof(RawConfig)] = typeof(OpenRawStream),
+            [typeof(FileConfig)] = typeof(OpenFileStream),
+            [typeof(UsbConfig)] = typeof(OpenUsbStream),
+            [typeof(BluetoothConfig)] = typeof(OpenBluetoothStream)
         };
     }
 
@@ -77,7 +80,7 @@ public static class OpenDeviceFactory
         where TConfig : IDeviceConfig
         where TDevice : OpenDeviceStream
     {
-        Communications.Add(typeof(TConfig), typeof(TDevice));
+        Communications[typeof(TConfig)] = typeof(TDevice);
     }
 
     /// <summary>
@@ -85,16 +88,31 @@ public static class OpenDeviceFactory
     /// </summary>
     /// <param name="config">Instância de configuração que define o tipo de comunicação desejado.</param>
     /// <returns>Uma instância de <see cref="OpenDeviceStream"/> correspondente à configuração fornecida.</returns>
+    /// <exception cref="ArgumentNullException">Lançada caso a configuração seja nula.</exception>
     /// <exception cref="OpenException">Lançada caso não seja encontrada uma classe de comunicação compatível com a configuração.</exception>
     public static OpenDeviceStream Create(IDeviceConfig config)
     {
-        var configType = config.GetType();
-        var device = (from c in Communications
-            where c.Key == configType || configType.IsAssignableFrom(c.Key)
-            select c.Value).FirstOrDefault();
+        if (config == null) throw new ArgumentNullException(nameof(config));
 
-        if(device == null) throw new OpenException("Classe de comunicação não localizada.");
-        return (OpenDeviceStream?)Activator.CreateInstance(device, config) ?? throw new OpenException("Erro ao instanciar a classe de comunicação.");
+        var configType = config.GetType();
+        if (!Communications.TryGetValue(configType, out var device))
+        {
+            device = (from c in Communications
+                where c.Key.IsAssignableFrom(configType)
+                select c.Value).FirstOrDefault();
+        }
+
+        if (device == null) throw new OpenException("Classe de comunicação não localizada.");
+
+        try
+        {
+            return (OpenDeviceStream?)Activator.CreateInstance(device, config) ??
+                   throw new OpenException("Erro ao instanciar a classe de comunicação.");
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException != null)
+        {
+            throw ex.InnerException;
+        }
     }
 
     #endregion Methods

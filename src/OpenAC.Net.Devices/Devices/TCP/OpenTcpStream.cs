@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -31,8 +31,9 @@
 
 using System;
 using System.IO;
-using System.Net;
 using System.Net.Sockets;
+using System.Threading;
+using System.Threading.Tasks;
 using OpenAC.Net.Core;
 using OpenAC.Net.Core.Extensions;
 
@@ -46,7 +47,6 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
     #region Fields
 
     private TcpClient? client;
-    private readonly IPEndPoint conEndPoint;
 
     #endregion Fields
 
@@ -58,18 +58,15 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
     /// <param name="config">Configuração TCP a ser utilizada.</param>
     public OpenTcpStream(TCPConfig config) : base(config)
     {
-        Guard.Against<ArgumentException>(config.IP!.IsEmpty(), "Endereço não informados");
-        Guard.Against<ArgumentException>(config.Porta < 1, "Porta não informados");
-
-        conEndPoint = new IPEndPoint(IPAddress.Parse(config.IP!), config.Porta);
-        client = new TcpClient();
+        Guard.Against<ArgumentException>(config.IP!.IsEmpty(), "Endereço não informado.");
+        Guard.Against<ArgumentException>(config.Porta < 1 || config.Porta > 65535, "Porta não informada ou inválida.");
     }
 
     #endregion Constructor
 
     #region Properties
 
-    protected override int Available => client?.Available ?? 0;
+    protected override int Available => client?.Connected == true ? client.Available : 0;
 
     #endregion Properties
 
@@ -80,20 +77,45 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
         if (client is not { Connected: true }) return;
 
         var stream = client.GetStream();
+        var bufferSize = Math.Max(Config.ReadBufferSize, 1);
+        var buffer = new byte[bufferSize];
 
         while (client.Available > 0)
         {
-            var inbyte = new byte[1];
-            _ = stream.Read(inbyte, 0, 1);
+            var toRead = Math.Min(client.Available, buffer.Length);
+            var read = stream.Read(buffer, 0, toRead);
+            if (read < 1) break;
         }
     }
 
     protected override bool OpenInternal()
     {
-        if(client is null) throw new ArgumentNullException(nameof(client));
         if (client is { Connected: true }) return false;
 
-        client.Connect(conEndPoint);
+        DisposeClient();
+        client = CreateConfiguredClient();
+        client.Connect(Config.IP!, Config.Porta);
+
+        var stream = client.GetStream();
+        Reader = new BinaryReader(stream);
+        Writer = new BinaryWriter(stream);
+
+        return client.Connected;
+    }
+
+    protected override async Task<bool> OpenInternalAsync(CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (client is { Connected: true }) return false;
+
+        DisposeClient();
+        client = CreateConfiguredClient();
+
+#if NET5_0_OR_GREATER
+        await client.ConnectAsync(Config.IP!, Config.Porta, cancellationToken).ConfigureAwait(false);
+#else
+        await client.ConnectAsync(Config.IP!, Config.Porta).ConfigureAwait(false);
+#endif
 
         var stream = client.GetStream();
         Reader = new BinaryReader(stream);
@@ -104,21 +126,57 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
 
     protected override bool CloseInternal()
     {
-        if (client is { Connected: false }) return false;
+        if (client == null && Reader == null && Writer == null) return false;
 
-        if(client is IDisposable disposable)
-            disposable.Dispose();
-        
-        Reader?.Dispose();
-        Writer?.Dispose();
+        DisposeClient();
+        return true;
+    }
+
+    private TcpClient CreateConfiguredClient()
+    {
+        var tcpClient = new TcpClient
+        {
+            ReceiveTimeout = Config.TimeOut * 1000,
+            SendTimeout = Config.TimeOut * 1000,
+            ReceiveBufferSize = Math.Max(Config.ReadBufferSize, 1),
+            SendBufferSize = Math.Max(Config.WriteBufferSize, 1)
+        };
+
+        return tcpClient;
+    }
+
+    private void DisposeClient()
+    {
+        try
+        {
+            Reader?.Dispose();
+        }
+        catch
+        {
+            // Ignora erro ao descartar Reader
+        }
+
+        try
+        {
+            Writer?.Dispose();
+        }
+        catch
+        {
+            // Ignora erro ao descartar Writer
+        }
+
+        try
+        {
+            ((IDisposable?)client)?.Dispose();
+        }
+        catch
+        {
+            // Ignora erro ao descartar TcpClient
+        }
 
         Reader = null;
         Writer = null;
-
         client = null;
-        client = new TcpClient();
-
-        return !client.Connected;
     }
 
     #endregion Methods
@@ -128,8 +186,7 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
     protected override void DisposeManaged()
     {
         base.DisposeManaged();
-        if(client is IDisposable disposable)
-            disposable.Dispose();
+        DisposeClient();
     }
 
     #endregion Dispose Methods

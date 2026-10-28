@@ -1,4 +1,4 @@
-﻿// ***********************************************************************
+// ***********************************************************************
 // Assembly         : OpenAC.Net.Devices
 // Author           : RFTD
 // Created          : 20-12-2018
@@ -106,8 +106,8 @@ internal sealed class OpenSerialStream(SerialConfig config) : OpenDeviceStream<S
         serialPort.Parity = Config.Parity;
         serialPort.StopBits = Config.StopBits;
         serialPort.Handshake = Config.Handshake;
-        serialPort.ReadTimeout = Config.TimeOut;
-        serialPort.WriteTimeout = Config.TimeOut;
+        serialPort.ReadTimeout = Config.TimeOut * 1000;
+        serialPort.WriteTimeout = Config.TimeOut * 1000;
         serialPort.ReadBufferSize = Config.ReadBufferSize;
         serialPort.WriteBufferSize = Config.WriteBufferSize;
     }

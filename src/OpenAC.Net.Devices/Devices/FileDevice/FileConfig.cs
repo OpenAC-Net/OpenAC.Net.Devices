@@ -29,6 +29,8 @@
 // <summary></summary>
 // ***********************************************************************
 
+using System;
+
 namespace OpenAC.Net.Devices;
 
 /// <summary>
@@ -39,7 +41,8 @@ public sealed class FileConfig : BaseConfig
     #region Fields
 
     private string? file;
-    private bool createIfNotExits;
+    
+    private bool createIfNotExists;
 
     #endregion Fields
 
@@ -77,10 +80,20 @@ public sealed class FileConfig : BaseConfig
     /// <summary>
     /// Obtém ou define se o arquivo deve ser criado caso não exista.
     /// </summary>
+    public bool CreateIfNotExists
+    {
+        get => createIfNotExists;
+        set => SetProperty(ref createIfNotExists, value);
+    }
+
+    /// <summary>
+    /// Obtém ou define se o arquivo deve ser criado caso não exista.
+    /// </summary>
+    [Obsolete("Use CreateIfNotExists")]
     public bool CreateIfNotExits
     {
-        get => createIfNotExits;
-        set => SetProperty(ref createIfNotExits, value);
+        get => CreateIfNotExists;
+        set => CreateIfNotExists = value;
     }
 
     #endregion Properties

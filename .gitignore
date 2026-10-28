@@ -182,3 +182,5 @@ FakesAssemblies/
 *.scgdat
 *.dat
 /src/.vs/*
+/skills/system/run-workflow/SKILL.md
+/src/skills/system/run-workflow/SKILL.md
