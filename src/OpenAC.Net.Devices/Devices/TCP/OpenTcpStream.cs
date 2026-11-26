@@ -94,7 +94,21 @@ internal sealed class OpenTcpStream : OpenDeviceStream<TCPConfig>
 
         DisposeClient();
         client = CreateConfiguredClient();
+
+        /*
         client.Connect(Config.IP!, Config.Porta);
+        */
+
+        var timeout = Config.TimeOut * 1000;
+        var result = client.BeginConnect(Config.IP!, Config.Porta, null, null);
+        using (result.AsyncWaitHandle)
+        {
+            if (!result.AsyncWaitHandle.WaitOne(timeout))
+            {
+                DisposeClient();
+                throw new TimeoutException($"Tempo limite de conexão excedido ({timeout} ms).");
+            }
+        }
 
         var stream = client.GetStream();
         Reader = new BinaryReader(stream);
