@@ -1,0 +1,49 @@
+name: Pull Request CI
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    working-directory: src
+
+jobs:
+  validate:
+    name: Build, Test and Pack
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+            11.x
+
+      - name: Build solution
+        run: dotnet build OpenAC.Net.Devices.sln --configuration Release -p:GeneratePackageOnBuild=false
+
+      - name: Run tests on .NET 9
+        run: dotnet run --project OpenAC.Net.Devices.Tests/OpenAC.Net.Devices.Tests.csproj --configuration Release --framework net9.0 --no-build
+
+      - name: Run tests on .NET 11
+        run: dotnet run --project OpenAC.Net.Devices.Tests/OpenAC.Net.Devices.Tests.csproj --configuration Release --framework net11.0 --no-build
+
+      - name: Pack NuGet package
+        run: dotnet pack OpenAC.Net.Devices/OpenAC.Net.Devices.csproj --configuration Release --no-build --output ../nuget
+
+      - name: Upload NuGet package
+        uses: actions/upload-artifact@v7
+        with:
+          name: nuget
+          if-no-files-found: error
+          retention-days: 7
+          path: nuget/*.nupkg

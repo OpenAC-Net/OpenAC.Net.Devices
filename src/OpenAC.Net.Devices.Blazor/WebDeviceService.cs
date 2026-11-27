@@ -19,9 +19,11 @@ public sealed class WebDeviceService(IJSRuntime js) : IAsyncDisposable
         try
         {
             ObjectDisposedException.ThrowIf(disposed, this);
+#pragma warning disable BL0016 // A inicialização propaga falhas ao chamador e libera o semáforo no finally.
             module ??= await js.InvokeAsync<IJSObjectReference>("import",
                 "./_content/OpenAC.Net.Devices.Blazor/openac-devices.js");
             manager ??= await module.InvokeAsync<IJSObjectReference>("createManager");
+#pragma warning restore BL0016
             return manager;
         }
         finally { initialization.Release(); }
@@ -37,6 +39,7 @@ public sealed class WebDeviceService(IJSRuntime js) : IAsyncDisposable
         }
     }
 
+#pragma warning disable BL0016 // As operações de consulta e seleção propagam falhas de interop ao chamador.
     public async Task<WebDeviceSupport> GetSupportAsync() =>
         await (await GetManagerAsync()).InvokeAsync<WebDeviceSupport>("support");
 
@@ -63,6 +66,7 @@ public sealed class WebDeviceService(IJSRuntime js) : IAsyncDisposable
         var infos = await owner.InvokeAsync<WebDeviceInfo[]>("getDevices", kind);
         return infos.Select(info => Wrap(owner, info)).ToArray();
     }
+#pragma warning restore BL0016
 
     public Task<WebDeviceButtonBinding> BindSerialButtonAsync(ElementReference button,
         Func<WebDevice, Task> onSelected, Func<string, Task>? onError = null, WebSerialRequestOptions? options = null) =>
@@ -108,7 +112,9 @@ public sealed class WebDeviceService(IJSRuntime js) : IAsyncDisposable
             }
 
             foreach (var device in selected) await Cleanup(device.DisposeAsync);
+#pragma warning disable BL0016 // Cleanup aguarda a chamada e trata suas exceções.
             if (manager != null) await Cleanup(() => manager.InvokeVoidAsync("dispose"));
+#pragma warning restore BL0016
             if (manager != null) await Cleanup(manager.DisposeAsync);
             if (module != null) await Cleanup(module.DisposeAsync);
             lock (devices) devices.Clear();

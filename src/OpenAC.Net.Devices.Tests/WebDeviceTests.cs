@@ -19,8 +19,10 @@ public class WebDeviceTests
         public int WriteFailures { get; set; }
         public WebDeviceReadStream? Receiver { get; private set; }
 
+#pragma warning disable BL0016 // O fake simula falhas sem executar JavaScript.
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args) =>
             InvokeAsync<TValue>(identifier, CancellationToken.None, args);
+#pragma warning restore BL0016
 
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, CancellationToken cancellationToken, object?[]? args)
         {
