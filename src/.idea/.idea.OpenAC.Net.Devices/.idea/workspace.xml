@@ -13,19 +13,7 @@
     <configurations />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../.github/workflows/publish.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/publish.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../.github/workflows/push.yml" beforeDir="false" afterPath="$PROJECT_DIR$/../.github/workflows/push.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../README.md" beforeDir="false" afterPath="$PROJECT_DIR$/../README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.OpenAC.Net.Devices/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/OpenAC.Net.Devices.Blazor.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/OpenAC.Net.Devices.Blazor.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDevice.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDevice.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDeviceButtonBinding.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDeviceButtonBinding.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDeviceService.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Blazor/WebDeviceService.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Tests/OpenAC.Net.Devices.Tests.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Tests/OpenAC.Net.Devices.Tests.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices.Tests/WebDeviceTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices.Tests/WebDeviceTests.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenAC.Net.Devices.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/OpenAC.Net.Devices/OpenAC.Net.Devices.csproj" afterDir="false" />
-    </list>
+    <list default="true" id="7fbf697f-bd21-49b6-bd72-d61cb29e5133" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -234,7 +222,8 @@
     <MESSAGE value="Adicionado o projeto OpenAC.Net.Devices.Blazor em testes para usar webserial." />
     <MESSAGE value="Ajustes na geração do pacote nuget." />
     <MESSAGE value="Correção de erro na inicialização da classe SerialConfig." />
-    <option name="LAST_COMMIT_MESSAGE" value="Correção de erro na inicialização da classe SerialConfig." />
+    <MESSAGE value="feat: adiciona suporte ao .NET 11 e atualiza CI&#10;&#10;Atualiza dependências e versão para 1.7.1, adiciona validação de pull requests e ajusta avisos do interop Blazor." />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: adiciona suporte ao .NET 11 e atualiza CI&#10;&#10;Atualiza dependências e versão para 1.7.1, adiciona validação de pull requests e ajusta avisos do interop Blazor." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
