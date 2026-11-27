@@ -6,7 +6,7 @@
 [![Discord](https://img.shields.io/badge/Chat%20on-Discord-purple.svg)](https://discord.com/invite/brdmJ7Yv6w)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Target Frameworks](https://img.shields.io/badge/.NET%20Framework-4.6.2%20%7C%204.8-blue.svg)](https://dotnet.microsoft.com/)
-[![Target Frameworks](https://img.shields.io/badge/.NET%20Core%20%2F%20Standard-netstandard2.0%20%7C%20net8.0%20%7C%20net9.0%20%7C%20net10.0-blue.svg)](https://dotnet.microsoft.com/)
+[![Target Frameworks](https://img.shields.io/badge/.NET%20Core%20%2F%20Standard-netstandard2.0%20%7C%20net8.0%20%7C%20net9.0%20%7C%20net10.0%20%7C%20net11.0-blue.svg)](https://dotnet.microsoft.com/)
 
 Biblioteca .NET multiplataforma para abstração e comunicação com dispositivos de automação comercial (impressoras térmicas ESC/POS, balanças, leitores, etiquetadoras e periféricos em geral).
 
@@ -33,7 +33,7 @@ Desenvolvida pelo time **OpenAC .Net**, a biblioteca fornece uma interface unifi
   - Escrita direta em arquivos ou dispositivos de bloco/caractere (`FileConfig`).
 - **Suporte a Blazor Server e WebAssembly (`OpenAC.Net.Devices.Blazor`)**:
   - WebSerial, WebUSB e Web Bluetooth (BLE/GATT) por interop assíncrono próprio, sem SpawnDev.
-  - .NET 8, 9 e 10, com seleção por gesto do usuário e verificação de suporte do navegador.
+  - .NET 8, 9, 10 e 11, com seleção por gesto do usuário e verificação de suporte do navegador.
 
 ---
 
@@ -232,7 +232,7 @@ await fileDevice.WriteAsync([0x1B, 0x40]);
 
 A extensão `OpenAC.Net.Devices.Blazor` usa as APIs do navegador por meio de
 `Microsoft.JSInterop`, sem SpawnDev nem bibliotecas JavaScript externas. Os alvos
-são **.NET 8, 9 e 10**, nos modos **Server / Interactive Server**, **WebAssembly /
+são **.NET 8, 9, 10 e 11**, nos modos **Server / Interactive Server**, **WebAssembly /
 Interactive WebAssembly** e **Interactive Auto**.
 
 No `Program.cs`, registre o serviço:

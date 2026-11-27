@@ -42,9 +42,11 @@ public sealed class WebDevice : IAsyncDisposable
         if (receiverReference == null)
             throw new InvalidOperationException("Abra o dispositivo com OpenAsync antes de escrever.");
         // Mantém as mensagens abaixo do limite padrão de 32 KiB do SignalR.
+#pragma warning disable BL0016 // O stream trata as falhas de escrita segundo sua política de retry.
         for (var offset = 0; offset < data.Length; offset += 8192)
             await manager.InvokeVoidAsync("write", cancellationToken, Info.Id,
                 data.AsSpan(offset, Math.Min(8192, data.Length - offset)).ToArray());
+#pragma warning restore BL0016
     }
 
     internal async Task CloseAsync(CancellationToken cancellationToken)
@@ -52,7 +54,9 @@ public sealed class WebDevice : IAsyncDisposable
         if (receiverReference == null) return;
         try
         {
+#pragma warning disable BL0016 // O chamador recebe a falha após a liberação da referência no finally.
             await manager.InvokeVoidAsync("close", cancellationToken, Info.Id);
+#pragma warning restore BL0016
         }
         finally
         {

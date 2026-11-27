@@ -19,8 +19,10 @@ public sealed class WebDeviceButtonBinding : IAsyncDisposable
         reference = DotNetObjectReference.Create(this);
     }
 
+#pragma warning disable BL0016 // WebDeviceService.BindAsync libera o vínculo quando a inicialização falha.
     internal async Task InitializeAsync(IJSObjectReference manager, ElementReference button, string kind, object options) =>
         binding = await manager.InvokeAsync<IJSObjectReference>("bind", button, kind, options, reference);
+#pragma warning restore BL0016
 
     [JSInvokable]
     public Task Selected(WebDeviceInfo info) => disposed ? Task.CompletedTask : onSelected(info);

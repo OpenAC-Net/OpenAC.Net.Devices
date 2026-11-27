@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
         <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -10,12 +10,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.19" Condition="'$(TargetFramework)' == 'net8.0'" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.8" Condition="'$(TargetFramework)' == 'net9.0'" />
-      <PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.0" Condition="'$(TargetFramework)' == 'net10.0'" />
-      <PackageReference Include="Microsoft.JSInterop" Version="8.0.19" Condition="'$(TargetFramework)' == 'net8.0'" />
-      <PackageReference Include="Microsoft.JSInterop" Version="9.0.8" Condition="'$(TargetFramework)' == 'net9.0'" />
-      <PackageReference Include="Microsoft.JSInterop" Version="10.0.0" Condition="'$(TargetFramework)' == 'net10.0'" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="8.0.34" Condition="'$(TargetFramework)' == 'net8.0'" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="9.0.23" Condition="'$(TargetFramework)' == 'net9.0'" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="10.0.15" Condition="'$(TargetFramework)' == 'net10.0'" />
+      <PackageReference Include="Microsoft.AspNetCore.Components" Version="11.0.0" Condition="'$(TargetFramework)' == 'net11.0'" />
+      <PackageReference Include="Microsoft.JSInterop" Version="8.0.34" Condition="'$(TargetFramework)' == 'net8.0'" />
+      <PackageReference Include="Microsoft.JSInterop" Version="9.0.23" Condition="'$(TargetFramework)' == 'net9.0'" />
+      <PackageReference Include="Microsoft.JSInterop" Version="10.0.15" Condition="'$(TargetFramework)' == 'net10.0'" />
+      <PackageReference Include="Microsoft.JSInterop" Version="11.0.0" Condition="'$(TargetFramework)' == 'net11.0'" />
     </ItemGroup>
 
     <ItemGroup>

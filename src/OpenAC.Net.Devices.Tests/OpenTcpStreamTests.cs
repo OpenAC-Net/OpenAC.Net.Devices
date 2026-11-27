@@ -9,7 +9,10 @@ public class OpenTcpStreamTests
     [Test]
     public async Task WriteRead_ComHostnameLocalhost_DeveEnviarEReceberDados()
     {
-        using var listener = new TcpListener(IPAddress.Loopback, 0);
+        const string host = "localhost";
+        // A ordem de resolução do loopback pode variar entre IPv4 e IPv6.
+        var loopback = (await Dns.GetHostAddressesAsync(host)).First(IPAddress.IsLoopback);
+        using var listener = new TcpListener(loopback, 0);
         listener.Start();
         var port = ((IPEndPoint)listener.LocalEndpoint).Port;
 
@@ -26,7 +29,7 @@ public class OpenTcpStreamTests
             await Task.Delay(100);
         });
 
-        var config = new TCPConfig("localhost", port)
+        var config = new TCPConfig(host, port)
         {
             ControlePorta = false,
             TimeOut = 2
